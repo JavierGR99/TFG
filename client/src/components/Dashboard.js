@@ -3,11 +3,12 @@ import { Card, Button, Alert } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import axios from "axios"
+import { auth } from "../firebase"
 
 
 export default function Dashboard() {
   const [error, setError] = useState("")
-  const { currentUser, logout } = useAuth()
+  const { currentUser, token, logout } = useAuth()
   const history = useHistory()
   const [apts, setApts] = useState([])
 
@@ -22,21 +23,31 @@ export default function Dashboard() {
     }
   }
 
-  async function getData() {
+  // async function getToken() {
+  //   const token = await auth.currentUser.getIdToken();
+  //   console.log
+  //   return token
+  // }
+
+  async function getApartments() {
+    const userToken = localStorage.getItem('user-token')
+
     const data = await (await axios.get("http://localhost:5000/api/apartments", {
       headers: {
-        uid: currentUser.uid
-      }
+        Authorization: 'Bearer ' + userToken,
+      },
     })).data
+
+    // const data = await (await axios.get("http://localhost:5000/api/apartments")).data
     setApts(data)
-    console.log(data)
-    axios.get("http://localhost:5000/api/users/DbbUV5nUgBWmREjnczfVkLLKMbJ2")
-    axios.delete("http://localhost:5000/api/users/DbbUV5nUgBWmREjnczfVkLLKMbJ2")
+
+    // axios.get("http://localhost:5000/api/users/DbbUV5nUgBWmREjnczfVkLLKMbJ2")
+    // axios.delete("http://localhost:5000/api/users/DbbUV5nUgBWmREjnczfVkLLKMbJ2")
 
   }
 
   useEffect(() => {
-    getData()
+    getApartments()
   }, [])
 
 

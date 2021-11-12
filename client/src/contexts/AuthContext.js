@@ -10,6 +10,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState()
   const [loading, setLoading] = useState(true)
+  const [token, setToken] = useState()
 
   function signup(email, password) {
     return auth.createUserWithEmailAndPassword(email, password)
@@ -41,6 +42,9 @@ export function AuthProvider({ children }) {
       setCurrentUser(user)
       setLoading(false)
 
+      // console.log(auth.currentUser.getIdToken())
+      // setToken(auth.currentUser.getIdToken())
+
     })
     return unsubscribe
 
@@ -49,6 +53,8 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
+    setToken,
+    token,
     login,
     signup,
     logout,
