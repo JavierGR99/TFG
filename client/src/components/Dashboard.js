@@ -11,6 +11,11 @@ export default function Dashboard() {
   const { currentUser, token, logout } = useAuth()
   const history = useHistory()
   const [apts, setApts] = useState([])
+  const [reqTickets, setReqTickets] = useState([])
+  const [acptTickets, setAcptTickets] = useState([])
+  const [doneTickets, setDoneTickets] = useState([])
+
+  const userToken = localStorage.getItem('user-token')
 
 
   async function handleLogout() {
@@ -23,14 +28,51 @@ export default function Dashboard() {
     }
   }
 
-  // async function getToken() {
-  //   const token = await auth.currentUser.getIdToken();
-  //   console.log
-  //   return token
-  // }
+  async function getRequestedTickets() {
+
+    const adminID = auth.currentUser.uid
+
+    const data = await (await axios.get('http://localhost:5000/api/tickets/adminID/${adminID}?state=requested', {
+      headers: {
+        Authorization: 'Bearer ' + userToken,
+      },
+    })).data
+
+    setReqTickets(data)
+
+  }
+
+  async function getAcptTickets() {
+
+    const adminID = auth.currentUser.uid
+
+    const data = await (await axios.get('http://localhost:5000/api/tickets/adminID/${adminID}?state=accepted', {
+      headers: {
+        Authorization: 'Bearer ' + userToken,
+      },
+    })).data
+
+    setAcptTickets(data)
+
+  }
+
+  async function getDoneTickets() {
+
+    const adminID = auth.currentUser.uid
+
+    const data = await (await axios.get('http://localhost:5000/api/tickets/adminID/${adminID}?state=done', {
+      headers: {
+        Authorization: 'Bearer ' + userToken,
+      },
+    })).data
+
+    setAcptTickets(data)
+
+  }
+
+
 
   async function getApartments() {
-    const userToken = localStorage.getItem('user-token')
 
     const data = await (await axios.get("http://localhost:5000/api/apartments", {
       headers: {
@@ -38,16 +80,14 @@ export default function Dashboard() {
       },
     })).data
 
-    // const data = await (await axios.get("http://localhost:5000/api/apartments")).data
     setApts(data)
-
-    // axios.get("http://localhost:5000/api/users/DbbUV5nUgBWmREjnczfVkLLKMbJ2")
-    // axios.delete("http://localhost:5000/api/users/DbbUV5nUgBWmREjnczfVkLLKMbJ2")
-
   }
 
   useEffect(() => {
     getApartments()
+    getRequestedTickets()
+    getAcptTickets()
+    getDoneTickets()
   }, [])
 
 
@@ -72,15 +112,61 @@ export default function Dashboard() {
           Log Out
         </Button>
       </div>
-      {
-        apts.length === 0 ? (
-          <div> NO APARTAMENTS</div>
-        ) : (
-          apts.map((apt) => {
-            return <div> {apt.name} </div>
-          })
-        )
-      }
+      <div>
+        {
+          apts.length === 0 ? (
+            <div> NO APARTAMENTS</div>
+          ) : (
+            apts.map((apt) => {
+              return <div> {apt.name} </div>
+            })
+          )
+        }
+      </div>
+      <br></br>
+      <div>
+        <span>TICKETS SOLICITADOS</span>
+        {
+          reqTickets.length === 0 ? (
+            <div> No tickets available </div>
+          ) : (
+            reqTickets.map((t) => {
+              return <div>
+                <span> {t.apartmentID} </span>
+              </div>
+            })
+          )
+        }
+      </div>
+
+      <br></br>
+      <div>
+        <span>TICKETS ACEPTADOS</span>
+        {
+          acptTickets.length === 0 ? (
+            <div> No tickets available </div>
+          ) : (
+            acptTickets.map((t) => {
+              return <div> {t.apartmentID}</div>
+            })
+          )
+        }
+      </div>
+
+      <br></br>
+      <div>
+        <span>TICKETS REALIZADOS</span>
+        {
+          doneTickets.length === 0 ? (
+            <div> No tickets available </div>
+          ) : (
+            doneTickets.map((t) => {
+              return <div> {t.apartmentID}</div>
+            })
+          )
+        }
+      </div>
+
     </>
   )
 }

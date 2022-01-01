@@ -89,7 +89,7 @@ app.get('/api/users', async (req, res) => {
 http://localhost:5000/api/tickets/workerID/jzHNOmnt2NbiFAAFesfILqEnWs63?type=limpieza&state=aceptado
 app.get('/api/tickets/workerID/:workerID', async (req, res) => {
 
-    console.log(req.query)
+
     try {
 
         var query = db.collection('tickets')
@@ -118,6 +118,46 @@ app.get('/api/tickets/workerID/:workerID', async (req, res) => {
         return res.send(error)
     }
 })
+
+// ADMIN is at dashboard and wants too see all tickets accepeted or done
+app.get('/api/tickets/adminID/:adminID', async (req, res) => {
+
+
+    try {
+
+        db.collection('admin').where("id", "==", req.params.adminID)
+
+
+        var query = db.collection('tickets')
+
+        if (req.query.type) {
+
+            query = query.where("type", "==", req.query.type)
+
+        }
+
+        if (req.query.state) {
+
+            query = query.where("state", "==", req.query.state)
+
+        }
+
+        const querySnapshot = await query.get();
+
+        const docs = querySnapshot.docs;
+
+        const response = docs.map(doc => doc.data())
+
+        return res.send(JSON.stringify(response))
+
+    } catch (error) {
+        return res.send(error)
+    }
+})
+
+
+
+
 
 //get all worker tickets with state acepted
 // Worker is at dashboard and wants too see all tickets he's accepeted or done
@@ -206,6 +246,7 @@ app.get('/api/tickets/state/:state/tenantID/:tenantID', async (req, res) => {
     }
 })
 
+
 //create new ticket with apartament, state and type
 // Example: teaneant creates a request ticket to clean the apartament 
 http://localhost:5000/api/tickets/tenantID/CPNDFv5mzwfCKnyj4dvTBdq5FLz1/apartmentID/AUTIcH0MtHM4ViZ5wu39/state/solicitar/type/limpieza
@@ -274,6 +315,8 @@ app.post('/api/tickets/adminID/:adminID/apartmentID/:apartmentID/state/:state/ty
     }
 })
 
+
+
 // UPDATE ticket from state "solicitar" to "aceptar"
 // Example: worker "cleaner" accepts a ticket
 http://localhost:5000/api/tickets/ticketId/kVSy9FMC3CDDhdnbgx2n/worker/jzHNOmnt2NbiFAAFesfILqEnWs63/stateAfter/aceptado
@@ -325,7 +368,6 @@ app.get('/api/apartments', async (req, res) => {
     } catch (error) {
         return res.send("ERROR")
     }
-
 
 })
 
