@@ -167,6 +167,14 @@ export default function Dashboard() {
         }
       </div>
 
+      <br></br>
+
+      <Link to="/NewTicket" className="btn btn-primary w-100 mt-3">
+        Create new ticket
+      </Link>
+
+
+
     </>
   )
 }

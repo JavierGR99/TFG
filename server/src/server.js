@@ -11,7 +11,11 @@ const middleware = require('./middleware');
 app.use(cors());
 // app.use(CheckLogged());
 
-app.use(middleware.decodeToken);
+// app.use(middleware.decodeToken);
+
+app.listen(port, () => {
+    console.log('server is running on port ' + port)
+})
 
 
 // ************** USERS ****************
@@ -371,6 +375,67 @@ app.get('/api/apartments', async (req, res) => {
 
 })
 
-app.listen(port, () => {
-    console.log('server is running on port ${port}')
+
+
+
+// ********** Workers ************
+
+//get workers
+app.get('/api/workers/', async (req, res) => {
+    // console.log(req.headers.authorization)
+    try {
+        var query = db.collection('workers');
+
+        if (req.query.type) {
+            query = query.where("type", "==", req.query.type)
+            console.log("Acceso workers tipo " + req.query.type)
+        }
+
+        if (req.query.name) {
+            query = query.where("type", "==", req.query.name)
+        }
+
+        const querySnapshot = await query.get();
+
+        const docs = querySnapshot.docs;
+
+        const response = docs.map(doc => ({
+            idUser: doc.data().id,
+            name: doc.data().name,
+            type: doc.data().type
+        }))
+
+        return res.send(JSON.stringify(response))
+
+    } catch (error) {
+        return res.send("ERROR")
+    }
+
+})
+
+//get a specific worker
+http://localhost:5000/api/workers/eVGJsl2GiOZZGAbH66M6Sd6gEfH3
+app.get('/api/workers/:workerID', async (req, res) => {
+
+
+    try {
+        const query = db.collection('workers').where("id", "==", req.params.workerID);
+
+        const querySnapshot = await query.get();
+
+        const docs = querySnapshot.docs;
+
+        const response = docs.map(doc => ({
+            idUser: doc.data().id,
+            name: doc.data().name,
+            type: doc.data().type
+        }))
+
+
+        return res.send(JSON.stringify(response))
+
+    } catch (error) {
+        return res.send("ERROR")
+    }
+
 })
