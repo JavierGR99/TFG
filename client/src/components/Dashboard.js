@@ -66,7 +66,7 @@ export default function Dashboard() {
       },
     })).data
 
-    setAcptTickets(data)
+    setDoneTickets(data)
 
   }
 
