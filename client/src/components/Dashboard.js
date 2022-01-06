@@ -8,7 +8,7 @@ import { auth } from "../firebase"
 
 export default function Dashboard() {
   const [error, setError] = useState("")
-  const { currentUser, token, logout } = useAuth()
+  const { currentUser, logout } = useAuth()
   const history = useHistory()
   const [apts, setApts] = useState([])
   const [reqTickets, setReqTickets] = useState([])
@@ -73,21 +73,35 @@ export default function Dashboard() {
 
 
   async function getApartments() {
+    try {
+      const data = await (await axios.get("http://localhost:5000/api/apartments", {
+        headers: {
+          Authorization: 'Bearer ' + userToken,
+        },
+      })).data
 
-    const data = await (await axios.get("http://localhost:5000/api/apartments", {
-      headers: {
-        Authorization: 'Bearer ' + userToken,
-      },
-    })).data
+      setApts(data)
 
-    setApts(data)
+    } catch (error) {
+      console.log(error.code)
+      if (error.code == 'auth/argument-error') {
+        history.push("/login")
+      }
+    }
+
+
+
+
   }
 
   useEffect(() => {
+
     getApartments()
     getRequestedTickets()
     getAcptTickets()
     getDoneTickets()
+
+
   }, [])
 
 
@@ -132,7 +146,7 @@ export default function Dashboard() {
           ) : (
             reqTickets.map((t) => {
               return <div>
-                <span> {t.apartmentID} </span>
+                <span> {t.ticketID} </span>
               </div>
             })
           )
@@ -147,7 +161,7 @@ export default function Dashboard() {
             <div> No tickets available </div>
           ) : (
             acptTickets.map((t) => {
-              return <div> {t.apartmentID}</div>
+              return <div> {t.ticketID}</div>
             })
           )
         }
@@ -161,7 +175,7 @@ export default function Dashboard() {
             <div> No tickets available </div>
           ) : (
             doneTickets.map((t) => {
-              return <div> {t.apartmentID}</div>
+              return <div> {t.ticketID}</div>
             })
           )
         }

@@ -8,7 +8,7 @@ class Middleware {
 
             if (decodeValue) {
                 req.user = decodeValue;
-                console.log(decodeValue)
+                // console.log(decodeValue)
                 return next();
             }
             return res.json({ message: 'Un authorize' });

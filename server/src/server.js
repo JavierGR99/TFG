@@ -1,17 +1,20 @@
 const admin = require('./config/firebase-config')
 const express = require('express')
+const bodyParser = require('body-parser');
 const db = admin.firestore()
 const app = express();
 const port = 5000;
 const cors = require('cors');
-// import CheckLogged from './middleware';
+
+app.use(bodyParser.json());
+app.use(express.urlencoded());
+
 
 const middleware = require('./middleware');
 
 app.use(cors());
-// app.use(CheckLogged());
 
-// app.use(middleware.decodeToken);
+app.use(middleware.decodeToken);
 
 app.listen(port, () => {
     console.log('server is running on port ' + port)
@@ -150,7 +153,11 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 
         const docs = querySnapshot.docs;
 
-        const response = docs.map(doc => doc.data())
+        const response = docs.map(doc => ({
+            ...doc.data(),
+            ticketID: doc.id
+        }))
+
 
         return res.send(JSON.stringify(response))
 
@@ -279,44 +286,62 @@ app.post('/api/tickets/tenantID/:tenantID/apartmentID/:apartmentID/state/:state/
     }
 })
 
-//create new ticket with apartament, state and type
-// Example: admin creates a request ticket to clean the apartament 
-http://localhost:5000/api/tickets/adminID/jzHNOmnt2NbiFAAFesfILqEnWs63/apartmentID/AUTIcH0MtHM4ViZ5wu39/state/solicitar/type/limpieza
-app.post('/api/tickets/adminID/:adminID/apartmentID/:apartmentID/state/:state/type/:type', async (req, res) => {
-
-    try {
-
-        //IF USER IS TENANT THEN tenant: req.params.userID
-        //IF USER IS ADMIN THEN search the actual tenant who's in the apartment
-        //and put it automatically
-
-        const query = db.collection('tenants')
-            .where("apartmentID", "==", req.params.apartmentID)
-            .where("state", "==", "active")
+//ADMIN CREATES NEW TICKET 
+http://localhost:5000/api/tickets/adminID/jzHNOmnt2NbiFAAFesfILqEnWs63/
+app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
 
 
-        const querySnapshot = await query.get();
+    //IF USER IS TENANT THEN tenant: req.params.userID
+    //IF USER IS ADMIN THEN search the actual tenant who's in the apartment
+    //and put it automatically
 
-
-        const docs = querySnapshot.docs;
-
-        const tenant = docs[0].data().userID;
-
-        const newTicket = {
-            apartmentID: req.params.apartmentID,
-            createdBy: req.params.adminID,
-            state: req.params.state,
-            type: req.params.type,
-            tenantID: tenant
-        }
-
-        db.collection('tickets').add(newTicket);
-
-        return res.status(201).send('Ticket added correctly' + "\n" + JSON.stringify(newTicket))
-
-    } catch (error) {
-        return res.send("ERROR")
+    //Check if admin is correct
+    if (db.collection('admin').where("id", "==", req.params.adminID)) {
+        console.log("admin checked correctly")
     }
+
+
+    var queryTeanant = db.collection('tenants')
+        .where("apartmentID", "==", req.body.apartmentID)
+        .where("state", "==", "active")
+
+    const querySnapshot = await queryTeanant.get();
+    var tenant = ""
+
+    if (querySnapshot.empty) {
+        console.log("NO TEANANT active in the APARTMENT")
+    } else {
+        console.log("TEANANT is active in the APARTMENT")
+        const docs = querySnapshot.docs;
+        tenant = docs[0].data().userID;
+    }
+
+    console.log(req.body)
+
+
+
+
+    var newTicket = {
+        ...req.body,
+        tenantID: tenant
+    }
+
+    // apartmentID: req.body.apartmentID,
+    // tenantID: tenant,
+    // state: req.body.state,
+    // type: req.body.type,
+    // description: req.body.description,
+    // timeSelected: req.body.timeSelected,
+    // createdBy: req.body.createdBy,
+    // createdTime: req.body.createdTime,
+
+
+    console.log(newTicket)
+
+    db.collection('tickets').add(newTicket);
+
+    return res.status(201).send('Ticket added correctly' + "\n" + JSON.stringify(newTicket))
+
 })
 
 
