@@ -42,7 +42,9 @@ function NewTicket() {
 
     async function getWorkers({ type }) {
 
-        const data = await (await axios.get('http://localhost:5000/api/workers/?type=' + type, {
+        const url = `http://localhost:5000/api/workers/?type=${type}`
+
+        const data = await (await axios.get(url, {
             headers: {
                 Authorization: 'Bearer ' + userToken,
             },
@@ -70,7 +72,7 @@ function NewTicket() {
 
         console.log("antes del post")
         try {
-            const data = await axios.post('http://localhost:5000/api/tickets/adminID/${adminID}', postData, {
+            await axios.post(`http://localhost:5000/api/tickets/adminID/${adminID}`, postData, {
                 headers: {
                     Authorization: 'Bearer ' + userToken,
                 },
@@ -88,19 +90,19 @@ function NewTicket() {
     }
 
     function ticketTypeChange(e) {
-        if (e.target.value == 2) {
+        if (e.target.value === "2") {
             setTicketType("runner")
-            if (ticketState == "accepted") {
+            if (ticketState === "accepted") {
                 getWorkers({ type: "runner" })
             }
-        } else if (e.target.value == 3) {
+        } else if (e.target.value === "3") {
             setTicketType("maintenance")
-            if (ticketState == "accepted") {
+            if (ticketState === "accepted") {
                 getWorkers({ type: "maintenance" })
             }
         } else {
             setTicketType("cleaning")
-            if (ticketState == "accepted") {
+            if (ticketState === "accepted") {
                 getWorkers({ type: "cleaning" })
             }
         }
@@ -109,14 +111,14 @@ function NewTicket() {
     }
 
     function stateTicketChange(e) {
-        if (e.target.value == 1) {
+        if (e.target.value === "1") {
             setTicketState("requested")
         }
-        if (e.target.value == 2) {
+        if (e.target.value === "2") {
             getWorkers({ type: ticketType })
             setTicketState("accepted")
         }
-        if (e.target.value == 3) {
+        if (e.target.value === "3") {
             setTicketState("done")
         }
 
@@ -140,8 +142,6 @@ function NewTicket() {
 
     function timeChange(e) {
         timeRef.current.value = e.target.value
-
-
     }
 
     function aptChange(e) {
@@ -150,7 +150,9 @@ function NewTicket() {
 
 
     useEffect(() => {
+
         getApartaments()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
@@ -208,13 +210,13 @@ function NewTicket() {
             </div>
 
             <div>
-                {ticketState == "accepted" &&
+                {ticketState === "accepted" &&
                     <label>
                         Workers:
                         <select>
                             {
                                 workers.map((w) => {
-                                    return <option value={w.id}>{w.name}</option>
+                                    return <option key={w.id} value={w.id}>{w.name}</option>
                                 })
                             }
                         </select>
@@ -234,7 +236,7 @@ function NewTicket() {
 
             <div>
                 <label>Choose a time:</label>
-                {ticketState == "accepted" &&
+                {ticketState === "accepted" &&
                     <input type="datetime-local" id="meeting-time"
                         name="meeting-time" ref={timeRef}
                         onChange={timeChange} required ></input>

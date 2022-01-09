@@ -395,7 +395,8 @@ app.get('/api/apartments', async (req, res) => {
         return res.send(JSON.stringify(response))
 
     } catch (error) {
-        return res.send("ERROR")
+        console.log("Invalid authentication")
+        return res.send(error.code).status(401)
     }
 
 })
@@ -425,7 +426,7 @@ app.get('/api/workers/', async (req, res) => {
         const docs = querySnapshot.docs;
 
         const response = docs.map(doc => ({
-            idUser: doc.data().id,
+            id: doc.data().id,
             name: doc.data().name,
             type: doc.data().type
         }))

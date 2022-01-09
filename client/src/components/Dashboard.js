@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react"
 import { Card, Button, Alert } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
-import axios from "axios"
 import { auth } from "../firebase"
-
+import { getTicket } from "../service/getTicket"
+import { getApartments } from "../service/getApartments"
 
 export default function Dashboard() {
   const [error, setError] = useState("")
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [doneTickets, setDoneTickets] = useState([])
 
   const userToken = localStorage.getItem('user-token')
+  const adminID = auth.currentUser.uid
 
 
   async function handleLogout() {
@@ -28,80 +29,48 @@ export default function Dashboard() {
     }
   }
 
-  async function getRequestedTickets() {
 
-    const adminID = auth.currentUser.uid
+  async function setup() {
 
-    const data = await (await axios.get('http://localhost:5000/api/tickets/adminID/${adminID}?state=requested', {
-      headers: {
-        Authorization: 'Bearer ' + userToken,
-      },
-    })).data
+    const acceptedTickets = await getTicket({
+      state: "accepted",
+      adminID: adminID,
+      userToken: userToken
+    })
 
-    setReqTickets(data)
+    setAcptTickets(acceptedTickets)
 
-  }
+    const requestedTickets = await getTicket({
+      state: "requested",
+      adminID: adminID,
+      userToken: userToken
+    })
 
-  async function getAcptTickets() {
+    setReqTickets(requestedTickets)
 
-    const adminID = auth.currentUser.uid
+    const doneTickets = await getTicket({
+      state: "done",
+      adminID: adminID,
+      userToken: userToken
+    })
 
-    const data = await (await axios.get('http://localhost:5000/api/tickets/adminID/${adminID}?state=accepted', {
-      headers: {
-        Authorization: 'Bearer ' + userToken,
-      },
-    })).data
+    setDoneTickets(doneTickets)
 
-    setAcptTickets(data)
+    const apartments = await getApartments({
+      userToken: userToken
+    })
 
-  }
-
-  async function getDoneTickets() {
-
-    const adminID = auth.currentUser.uid
-
-    const data = await (await axios.get('http://localhost:5000/api/tickets/adminID/${adminID}?state=done', {
-      headers: {
-        Authorization: 'Bearer ' + userToken,
-      },
-    })).data
-
-    setDoneTickets(data)
+    setApts(apartments)
 
   }
 
 
-
-  async function getApartments() {
-    try {
-      const data = await (await axios.get("http://localhost:5000/api/apartments", {
-        headers: {
-          Authorization: 'Bearer ' + userToken,
-        },
-      })).data
-
-      setApts(data)
-
-    } catch (error) {
-      console.log(error.code)
-      if (error.code == 'auth/argument-error') {
-        history.push("/login")
-      }
-    }
-
-
-
-
-  }
 
   useEffect(() => {
 
-    getApartments()
-    getRequestedTickets()
-    getAcptTickets()
-    getDoneTickets()
+    setup()
 
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
