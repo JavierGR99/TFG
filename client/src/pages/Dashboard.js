@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
 import { auth } from "../firebase"
 import { getTicket } from "../service/getTicket"
-import Tickets from "./Tickets"
+import Tickets from '../components/Tickets'
 
 export default function Dashboard() {
   const [error, setError] = useState("")

@@ -1,14 +1,17 @@
 import React from "react"
-import Signup from "./Signup"
+
 import { Container } from "react-bootstrap"
 import { AuthProvider } from "../contexts/AuthContext"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Dashboard from "./Dashboard"
-import Login from "./Login"
+
 import PrivateRoute from "./PrivateRoute"
-import ForgotPassword from "./ForgotPassword"
-import UpdateProfile from "./UpdateProfile"
-import NewTicket from "./NewTicket"
+import Dashboard from "../pages/Dashboard"
+import ForgotPassword from "../pages/ForgotPassword"
+import NewTicket from "../pages/NewTicket"
+import UpdateProfile from "../pages/UpdateProfile"
+import Signup from "../pages/Signup"
+import Login from "../pages/Login"
+
 
 function App() {
 

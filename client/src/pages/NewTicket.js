@@ -3,12 +3,13 @@ import { auth } from '../firebase'
 import { useHistory } from 'react-router-dom'
 import { useState, useEffect, useRef, createRef } from 'react'
 import { postTicket } from '../service/postTicket'
-import ApartmentsSelect from './ApartmentsSelect'
-import TimeChoose from './TimeChoose'
 import { getApartments } from '../service/getApartments'
-import WorkersSelect from './WorkersSelect'
-import TypeSelect from './TypeSelect'
-import StateSelect from './StateSelect'
+import StateSelect from '../components/StateSelect'
+import TypeSelect from '../components/TypeSelect'
+import WorkersSelect from '../components/WorkersSelect'
+import TimeChoose from '../components/TimeChoose'
+import ApartmentsSelect from '../components/ApartmentsSelect'
+
 
 function NewTicket() {
 
