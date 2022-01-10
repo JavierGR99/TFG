@@ -5,6 +5,7 @@ import { Link, useHistory } from "react-router-dom"
 import { auth } from "../firebase"
 import { getTicket } from "../service/getTicket"
 import { getApartments } from "../service/getApartments"
+import Tickets from "./Tickets"
 
 export default function Dashboard() {
   const [error, setError] = useState("")
@@ -32,33 +33,24 @@ export default function Dashboard() {
 
   async function setup() {
 
-    const acceptedTickets = await getTicket({
+    setAcptTickets(await getTicket({
       state: "accepted",
       adminID: adminID,
-      userToken: userToken
-    })
+    }))
 
-    setAcptTickets(acceptedTickets)
-
-    const requestedTickets = await getTicket({
+    setReqTickets(await getTicket({
       state: "requested",
       adminID: adminID,
-      userToken: userToken
-    })
+    }))
 
-    setReqTickets(requestedTickets)
 
-    const doneTickets = await getTicket({
+
+    setDoneTickets(await getTicket({
       state: "done",
       adminID: adminID,
-      userToken: userToken
-    })
+    }))
 
-    setDoneTickets(doneTickets)
-
-    const apartments = await getApartments()
-
-    setApts(apartments)
+    setApts(await getApartments())
 
   }
 
@@ -93,62 +85,10 @@ export default function Dashboard() {
           Log Out
         </Button>
       </div>
-      <div>
-        {
-          apts.length === 0 ? (
-            <div> NO APARTAMENTS</div>
-          ) : (
-            apts.map((apt) => {
-              return <div> {apt.name} </div>
-            })
-          )
-        }
-      </div>
-      <br></br>
-      <div>
-        <span>TICKETS SOLICITADOS</span>
-        {
-          reqTickets.length === 0 ? (
-            <div> No tickets available </div>
-          ) : (
-            reqTickets.map((t) => {
-              return <div>
-                <span> {t.ticketID} </span>
-              </div>
-            })
-          )
-        }
-      </div>
 
-      <br></br>
-      <div>
-        <span>TICKETS ACEPTADOS</span>
-        {
-          acptTickets.length === 0 ? (
-            <div> No tickets available </div>
-          ) : (
-            acptTickets.map((t) => {
-              return <div> {t.ticketID}</div>
-            })
-          )
-        }
-      </div>
-
-      <br></br>
-      <div>
-        <span>TICKETS REALIZADOS</span>
-        {
-          doneTickets.length === 0 ? (
-            <div> No tickets available </div>
-          ) : (
-            doneTickets.map((t) => {
-              return <div> {t.ticketID}</div>
-            })
-          )
-        }
-      </div>
-
-      <br></br>
+      <Tickets state={"SOLICITADOS"} tickets={reqTickets}></Tickets>
+      <Tickets state={"ACEPTADOS"} tickets={acptTickets}></Tickets>
+      <Tickets state={"REALIZADOS"} tickets={doneTickets}></Tickets>
 
       <Link to="/NewTicket" className="btn btn-primary w-100 mt-3">
         Create new ticket

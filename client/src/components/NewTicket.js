@@ -2,21 +2,25 @@ import React from 'react'
 import axios from "axios"
 import { auth } from '../firebase'
 import { useHistory } from 'react-router-dom'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, createRef } from 'react'
 import { getWorkers } from '../service/getWorkers'
+import { postTicket } from '../service/postTicket'
+import ApartmentsSelect from './ApartmentsSelect'
+import TimeChoose from './TimeChoose'
+import { getApartments } from '../service/getApartments'
 
 function NewTicket() {
 
     const timeRef = useRef("")
-    const aptRef = useRef(null)
+    const aptRef = createRef("")
+    const workerRef = useRef("")
+    const typeRef = useRef("")
+    const stateRef = useRef("")
     const descriptionRef = useRef(null)
     const [apts, setApts] = useState([])
-    const [ticketState, setTicketState] = useState("requested")
-    const [ticketType, setTicketType] = useState("cleaning")
     const [workers, setWorkers] = useState([])
     const history = useHistory()
 
-    const userToken = localStorage.getItem('user-token')
 
     const typeOfTickets = [
         { id: 1, type: "cleaning" },
@@ -31,14 +35,8 @@ function NewTicket() {
     ]
 
 
-    async function getApartaments() {
-        const data = await (await axios.get("http://localhost:5000/api/apartments", {
-            headers: {
-                Authorization: 'Bearer ' + userToken,
-            },
-        })).data
-
-        setApts(data)
+    async function setup() {
+        setApts(await getApartments())
     }
 
     async function getWorkersLocal({ type }) {
@@ -57,26 +55,21 @@ function NewTicket() {
 
         const postData = {
             apartmentID: aptRef.current.value,
-            state: ticketState,
-            type: ticketType,
+            state: stateRef.current.value,
+            type: typeRef.current.value,
+            worker: workerRef.current.value || null,
             description: descriptionRef.current.value,
-            timeSelected: timeRef.current.value,
+            timeSelected: timeRef.current.value || null,
             createdBy: adminID,
             createdTime: todaysDate
-        }
-
-        console.log("antes del post")
-        try {
-            await axios.post(`http://localhost:5000/api/tickets/adminID/${adminID}`, postData, {
-                headers: {
-                    Authorization: 'Bearer ' + userToken,
-                },
-            })
-        } catch (error) {
 
         }
 
-        console.log("despues del post")
+        await postTicket({
+            postData: postData,
+            adminID: adminID
+        })
+
 
         history.push("/")
 
@@ -85,66 +78,36 @@ function NewTicket() {
     }
 
     async function ticketTypeChange(e) {
-        if (e.target.value === "2") {
-            setTicketType("runner")
-            if (ticketState === "accepted") {
-                setWorkers(await getWorkers({ type: "runner" }))
-            }
-        } else if (e.target.value === "3") {
-            setTicketType("maintenance")
-            if (ticketState === "accepted") {
-                setWorkers(await getWorkers({ type: "maintenance" }))
-            }
-        } else {
-            setTicketType("cleaning")
-            if (ticketState === "accepted") {
-                setWorkers(await getWorkers({ type: "cleaning" }))
-            }
+
+        typeRef.current.value = e.target.value
+        if (stateRef.current.value != "requested") {
+            setWorkers(await getWorkers({ type: typeRef.current.value }))
         }
-
-
     }
 
     async function stateTicketChange(e) {
-        if (e.target.value === "1") {
-            setTicketState("requested")
-        }
-        if (e.target.value === "2") {
 
-            // const workers = await getWorkers({ type: ticketType })
-            // setWorkers(workers)
-
-            getWorkersLocal({ type: ticketType })
-            setTicketState("accepted")
-        }
-        if (e.target.value === "3") {
-            setTicketState("done")
-        }
+        stateRef.current.value = e.target.value
+        setWorkers(await getWorkers({ type: typeRef.current.value }))
 
     }
 
     async function getTodayDate() {
         //Slice for getting correct format 
         var today = new Date().toISOString().slice(0, -8);
-
         return today
     }
 
 
-    function timeChange(e) {
-        timeRef.current.value = e.target.value
-    }
-
-    function aptChange(e) {
-        aptRef.current.value = e.target.value
-    }
-
-
     useEffect(() => {
-
-        getApartaments()
+        setup()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [stateRef.current.value])
+
 
 
 
@@ -152,35 +115,14 @@ function NewTicket() {
     return (
         <form onSubmit={handleSubmit}>
 
-            <div>
-                <label>
-                    Select apartament:
-                </label>
-
-                {
-                    apts.length === 0 ? (
-                        <label> NO APARTAMENTS</label>
-                    ) : (
-                        <select ref={aptRef} onChange={aptChange}> {
-
-                            apts.map((apt) => {
-                                return <option key={apt.id} value={apt.id}> {apt.name} {apt.number} </option>
-                            })
-                        }
-                        </select>
-                    )
-                }
-
-
-            </div>
-
+            <ApartmentsSelect ref={aptRef} apts={apts}></ApartmentsSelect>
             <div>
                 <label>
                     Type:
-                    <select onChange={ticketTypeChange}>
+                    <select ref={typeRef} onChange={ticketTypeChange}>
                         {
                             typeOfTickets.map((type) => {
-                                return <option key={type.id} value={type.id}>{type.type}</option>
+                                return <option key={type.id} value={type.type}>{type.type}</option>
                             })
                         }
                     </select>
@@ -190,10 +132,10 @@ function NewTicket() {
             <div>
                 <label>
                     State:
-                    <select onChange={stateTicketChange} >
+                    <select ref={stateRef} onChange={stateTicketChange} >
                         {
                             typeOfState.map((s) => {
-                                return <option key={s.id} value={s.id}>{s.state}</option>
+                                return <option key={s.id} value={s.state}>{s.state}</option>
                             })
                         }
                     </select>
@@ -201,7 +143,7 @@ function NewTicket() {
             </div>
 
             <div>
-                {ticketState === "accepted" &&
+                {stateRef.current.value != "requested" &&
                     <label>
                         Workers:
                         <select>
@@ -219,22 +161,10 @@ function NewTicket() {
                 <label>
                     Description:
                 </label> <br />
-
                 <textarea ref={descriptionRef} placeholder='Write here'>
-
                 </textarea>
             </div>
-
-            <div>
-                <label>Choose a time:</label>
-                {ticketState === "accepted" &&
-                    <input type="datetime-local" id="meeting-time"
-                        name="meeting-time" ref={timeRef}
-                        onChange={timeChange} required ></input>
-                }
-
-            </div>
-
+            <TimeChoose ref={timeRef} ticketState={stateRef.current.value}></TimeChoose>
             <input type="submit" value="Save ticket" />
         </form >
     )

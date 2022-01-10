@@ -9,7 +9,6 @@ class Middleware {
 
             if (decodeValue) {
                 req.user = decodeValue;
-                // console.log(decodeValue)
                 return next();
             }
         } catch (e) {

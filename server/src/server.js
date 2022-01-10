@@ -298,12 +298,14 @@ app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
     //Check if admin is correct
     if (db.collection('admin').where("id", "==", req.params.adminID)) {
         console.log("admin checked correctly")
+    } else {
+        return res.status.apply(401).json({ error: "Not authorized" })
     }
-
 
     var queryTeanant = db.collection('tenants')
         .where("apartmentID", "==", req.body.apartmentID)
         .where("state", "==", "active")
+
 
     const querySnapshot = await queryTeanant.get();
     var tenant = ""
@@ -313,32 +315,29 @@ app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
     } else {
         console.log("TEANANT is active in the APARTMENT")
         const docs = querySnapshot.docs;
+        console.log(docs)
         tenant = docs[0].data().userID;
     }
-
-    console.log(req.body)
-
-
-
 
     var newTicket = {
         ...req.body,
         tenantID: tenant
     }
 
-    // apartmentID: req.body.apartmentID,
-    // tenantID: tenant,
-    // state: req.body.state,
-    // type: req.body.type,
-    // description: req.body.description,
-    // timeSelected: req.body.timeSelected,
-    // createdBy: req.body.createdBy,
-    // createdTime: req.body.createdTime,
 
 
-    console.log(newTicket)
+    db.collection('tickets').add(newTicket).
+        then(function (docRef) {
+            newTicket = {
+                ...newTicket,
+                ticketID: docRef.id
+            }
+            console.log("Ticket added correctyly: ")
+            console.log(newTicket)
 
-    db.collection('tickets').add(newTicket);
+        })
+
+
 
     return res.status(201).send('Ticket added correctly' + "\n" + JSON.stringify(newTicket))
 
