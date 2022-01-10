@@ -9,9 +9,11 @@ function Tickets({ tickets, state }) {
                     <div> No tickets available </div>
                 ) : (
                     tickets.map((t) => {
-                        return <div>
-                            <span> {t.ticketID} </span>
-                        </div>
+                        return (
+                            <div key={t.ticketID}>
+                                <span > {t.ticketID} </span>
+                            </div>
+                        )
                     })
                 )
             }

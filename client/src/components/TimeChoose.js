@@ -8,11 +8,13 @@ function TimeChoose(props, ref) {
 
     return (
         <div>
-            <label>Choose a time:</label>
-            {props.ticketState != "requested" &&
-                <input type="datetime-local" id="meeting-time"
-                    name="meeting-time" ref={ref}
-                    onChange={timeChange} required ></input>
+
+            {props.ticketState !== "requested" &&
+                <label>Choose a time:
+                    <input type="datetime-local" id="meeting-time"
+                        name="meeting-time" ref={ref}
+                        onChange={timeChange} required ></input>
+                </label>
             }
         </div>
     )

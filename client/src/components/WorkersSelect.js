@@ -3,15 +3,17 @@ import React from 'react'
 function WorkersSelect(props, ref) {
     return (
         <div>
-            <label>Workers:                </label>
-            {ticketState != "requested" &&
-                <select>
-                    {
-                        workers.map((w) => {
-                            return <option key={w.id} value={w.id}>{w.name}</option>
-                        })
-                    }
-                </select>
+            {props.ticketState !== "requested" &&
+                <label>
+                    Workers:
+                    <select ref={ref}>
+                        {
+                            props.workers.map((w) => {
+                                return <option key={w.id} value={w.id}>{w.name}</option>
+                            })
+                        }
+                    </select>
+                </label>
             }
         </div>
 

@@ -9,8 +9,6 @@ function ApartmentsSelect(props, ref) {
     return (
         <div>
             <label>Select apartament:</label>
-            {/* {console.log(ref.current.value)} */}
-
             {
                 props.apts.length === 0 ? (
                     <label> NO APARTAMENTS</label>
