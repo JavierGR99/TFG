@@ -56,9 +56,7 @@ export default function Dashboard() {
 
     setDoneTickets(doneTickets)
 
-    const apartments = await getApartments({
-      userToken: userToken
-    })
+    const apartments = await getApartments()
 
     setApts(apartments)
 

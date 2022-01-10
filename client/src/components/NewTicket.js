@@ -3,6 +3,7 @@ import axios from "axios"
 import { auth } from '../firebase'
 import { useHistory } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
+import { getWorkers } from '../service/getWorkers'
 
 function NewTicket() {
 
@@ -40,17 +41,11 @@ function NewTicket() {
         setApts(data)
     }
 
-    async function getWorkers({ type }) {
+    async function getWorkersLocal({ type }) {
 
-        const url = `http://localhost:5000/api/workers/?type=${type}`
+        const workers = await getWorkers({ type: type })
 
-        const data = await (await axios.get(url, {
-            headers: {
-                Authorization: 'Bearer ' + userToken,
-            },
-        })).data
-
-        setWorkers(data)
+        setWorkers(workers)
     }
 
     async function handleSubmit(e) {
@@ -89,33 +84,37 @@ function NewTicket() {
 
     }
 
-    function ticketTypeChange(e) {
+    async function ticketTypeChange(e) {
         if (e.target.value === "2") {
             setTicketType("runner")
             if (ticketState === "accepted") {
-                getWorkers({ type: "runner" })
+                setWorkers(await getWorkers({ type: "runner" }))
             }
         } else if (e.target.value === "3") {
             setTicketType("maintenance")
             if (ticketState === "accepted") {
-                getWorkers({ type: "maintenance" })
+                setWorkers(await getWorkers({ type: "maintenance" }))
             }
         } else {
             setTicketType("cleaning")
             if (ticketState === "accepted") {
-                getWorkers({ type: "cleaning" })
+                setWorkers(await getWorkers({ type: "cleaning" }))
             }
         }
 
 
     }
 
-    function stateTicketChange(e) {
+    async function stateTicketChange(e) {
         if (e.target.value === "1") {
             setTicketState("requested")
         }
         if (e.target.value === "2") {
-            getWorkers({ type: ticketType })
+
+            // const workers = await getWorkers({ type: ticketType })
+            // setWorkers(workers)
+
+            getWorkersLocal({ type: ticketType })
             setTicketState("accepted")
         }
         if (e.target.value === "3") {
@@ -131,14 +130,6 @@ function NewTicket() {
         return today
     }
 
-    // function getTodayDate() {
-    //     var today = new Date().toISOString();
-
-    //     // var date = today.getFullYear() + '-' + "0" + (today.getMonth() + 1) + '-' + "0" + today.getDate();
-    //     // var time = today.getHours() + ":" + today.getMinutes()
-    //     // var dateTime = date + "T" + time;
-    //     return today
-    // }
 
     function timeChange(e) {
         timeRef.current.value = e.target.value

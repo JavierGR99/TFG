@@ -1,17 +1,19 @@
 import axios from "axios";
 
 
-export async function getTicket(props) {
+export async function getWorkers(props) {
 
     const userToken = localStorage.getItem('user-token')
 
-    const url = `http://localhost:5000/api/tickets/adminID/${props.adminID}?state=${props.state}`
+    const url = `http://localhost:5000/api/workers/?type=${props.type}`
 
     return await axios.get(url, {
         headers: {
             Authorization: 'Bearer ' + userToken,
         },
     }).then(response => {
+
+        console.log(response.data)
 
         return response.data
 
