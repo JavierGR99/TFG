@@ -13,9 +13,9 @@ import ApartmentsSelect from '../components/ApartmentsSelect'
 
 function NewTicket() {
 
-    const timeRef = useRef("")
+    const timeRef = useRef(null)
     const aptRef = createRef("")
-    const workerRef = useRef("")
+    const workerRef = useRef(null)
     const typeRef = useRef("")
     const stateRef = useRef("")
     const descriptionRef = useRef(null)
@@ -46,16 +46,25 @@ function NewTicket() {
         const adminID = auth.currentUser.uid
         const todaysDate = await getTodayDate()
 
-        const postData = {
+        var postData = {
             apartmentID: aptRef.current.value,
             state: stateRef.current.value,
             type: typeRef.current.value,
-            worker: workerRef.current.value || null,
             description: descriptionRef.current.value,
-            timeSelected: timeRef.current.value || null,
             createdBy: adminID,
             createdTime: todaysDate
         }
+
+
+        if (stateRef.current.value !== "requested") {
+            var postData = {
+                ...postData,
+                worker: workerRef.current.value,
+                timeSelected: timeRef.current.value,
+            }
+        }
+
+
 
         await postTicket({
             postData: postData,
