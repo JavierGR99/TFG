@@ -46,7 +46,7 @@ function NewTicket() {
         const adminID = auth.currentUser.uid
         const todaysDate = await getTodayDate()
 
-        var postData = {
+        let postData = {
             apartmentID: aptRef.current.value,
             state: stateRef.current.value,
             type: typeRef.current.value,
@@ -57,11 +57,8 @@ function NewTicket() {
 
 
         if (stateRef.current.value !== "requested") {
-            var postData = {
-                ...postData,
-                worker: workerRef.current.value,
-                timeSelected: timeRef.current.value,
-            }
+            postData.worker = workerRef.current.value
+            postData.timeSelected = timeRef.current.value
         }
 
 
