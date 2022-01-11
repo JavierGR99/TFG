@@ -10,6 +10,7 @@ app.use(bodyParser.json());
 app.use(express.urlencoded());
 
 
+
 const middleware = require('./middleware');
 
 app.use(cors());
@@ -25,6 +26,7 @@ app.listen(port, () => {
 
 //get a single contact
 app.get('/api/users/:userId', (req, res) => {
+
 
     const userId = req.params.userId;
 
@@ -281,6 +283,7 @@ app.post('/api/tickets/tenantID/:tenantID/apartmentID/:apartmentID/state/:state/
 
         return res.status(201).send('Ticket added correctly' + "\n" + JSON.stringify(newTicket))
 
+
     } catch (error) {
         return res.send("ERROR")
     }
@@ -405,9 +408,9 @@ app.get('/api/apartments', async (req, res) => {
 
 // ********** Workers ************
 
-//get workers
+//get workers list with type or name
 app.get('/api/workers/', async (req, res) => {
-    // console.log(req.headers.authorization)
+
     try {
         var query = db.collection('workers');
 
@@ -438,6 +441,8 @@ app.get('/api/workers/', async (req, res) => {
 
 })
 
+
+
 //get a specific worker
 http://localhost:5000/api/workers/eVGJsl2GiOZZGAbH66M6Sd6gEfH3
 app.get('/api/workers/:workerID', async (req, res) => {
@@ -464,3 +469,34 @@ app.get('/api/workers/:workerID', async (req, res) => {
     }
 
 })
+
+
+// ********** SIGNUP ************
+
+app.post('/api/signUp/userID/:userID', async (req, res) => {
+
+    console.log("me meto 1")
+    console.log(req.params.userID)
+    try {
+        const user = {
+            id: req.params.userID,
+            role: "tenant"
+        }
+
+        console.log("me meto 2")
+
+        db.collection('users').add(user)
+        console.log("User registered succesfully: " + user)
+
+        return res.status(200).send(JSON.stringify(user))
+
+    } catch (e) {
+        return res.json({ error: e })
+    }
+
+
+})
+
+
+
+

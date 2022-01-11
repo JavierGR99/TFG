@@ -14,6 +14,9 @@ export function AuthProvider({ children }) {
 
   function signup(email, password) {
     return auth.createUserWithEmailAndPassword(email, password)
+      .then(function (docRef) {
+        return docRef.user.uid
+      })
   }
 
   function login(email, password) {

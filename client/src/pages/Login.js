@@ -20,6 +20,7 @@ export default function Login() {
       await login(emailRef.current.value, passwordRef.current.value)
       const token = await auth.currentUser.getIdToken()
       localStorage.setItem('user-token', token)
+      localStorage.setItem('role',)
       history.push("/")
     } catch {
       setError("Failed to log in")

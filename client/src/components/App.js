@@ -4,7 +4,7 @@ import { Container } from "react-bootstrap"
 import { AuthProvider } from "../contexts/AuthContext"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 
-import PrivateRoute from "./PrivateRoute"
+import PrivateRoute from "../routes/PrivateRoute"
 import Dashboard from "../pages/Dashboard"
 import ForgotPassword from "../pages/ForgotPassword"
 import NewTicket from "../pages/NewTicket"
