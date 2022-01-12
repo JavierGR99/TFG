@@ -12,6 +12,7 @@ app.use(express.urlencoded());
 
 
 const middleware = require('./middleware');
+const { json } = require('express');
 
 app.use(cors());
 
@@ -46,10 +47,6 @@ app.get('/api/rol/userID/:userID', async (req, res) => {
 
 // ********* TICKETS ******************
 
-//get all worker tickets with state acepted
-// Worker is at dashboard and wants too see all tickets he's accepeted or done
-// Worker wants to see all tickets with state "aceptar" or "finalizado" and type "limpieza"
-http://localhost:5000/api/tickets/workerID/jzHNOmnt2NbiFAAFesfILqEnWs63?type=limpieza&state=aceptado
 app.get('/api/tickets/workerID/:workerID', async (req, res) => {
 
     try {
@@ -154,14 +151,36 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 
         const docs = querySnapshot.docs;
 
-        const response = docs.map(doc => ({
-            ...doc.data(),
-            ticketID: doc.id
-        }))
+        // const response = docs.map(doc => ({
+        //     ...doc.data(),
+        //     ticketID: doc.id
+        // }))
+
+        var response = {}
+        docs.map(async doc => {
+            const aptID = await doc.data().apartmentID
+            const aptData = await db.collection('apartaments').doc(aptID).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        return doc.data()
+                    }
+                })
+
+            response = JSON.stringify({
+                ...doc.data(),
+                aptBlock: aptData.block,
+                aptName: aptData.name,
+                aptNumer: aptData.number,
+                ticketID: doc.id
+            })
+
+        })
 
 
+        console.log(response)
 
-        return res.send(JSON.stringify(response))
+
+        return res.status(200).json(response)
 
     } catch (error) {
         return res.send(error)

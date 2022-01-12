@@ -58,7 +58,7 @@ function NewTicket() {
 
         if (stateRef.current.value !== "requested") {
             postData.worker = workerRef.current.value
-            postData.timeSelected = timeRef.current.value
+            // postData.timeSelected = timeRef.current.value
         }
 
 
@@ -108,7 +108,7 @@ function NewTicket() {
                 </textarea>
             </div>
 
-            <TimeChoose ref={timeRef} ticketState={stateRef.current.value}></TimeChoose>
+            {/* <TimeChoose ref={timeRef} ticketState={stateRef.current.value}></TimeChoose> */}
 
             <input type="submit" value="Save ticket" />
         </form >
