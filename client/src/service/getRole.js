@@ -12,7 +12,6 @@ export async function getRole(props) {
             Authorization: 'Bearer ' + userToken,
         },
     }).then(response => {
-        console.log(response.data)
         return response.data
 
     }).catch(error => {

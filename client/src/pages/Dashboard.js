@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [doneTickets, setDoneTickets] = useState([])
   const [role, setRole] = useState([])
 
-  const adminID = auth.currentUser.uid
+  const userID = auth.currentUser.uid
 
 
   async function handleLogout() {
@@ -33,23 +33,26 @@ export default function Dashboard() {
   async function setup() {
 
     const role = await getRole({
-      userID: adminID
+      userID: userID
     })
 
     setRole(role)
 
     setAcptTickets(await getTicket({
       state: "accepted",
+      userID: userID,
       role: role,
     }))
 
     setReqTickets(await getTicket({
       state: "requested",
+      userID: userID,
       role: role,
     }))
 
     setDoneTickets(await getTicket({
       state: "done",
+      userID: userID,
       role: role,
     }))
 

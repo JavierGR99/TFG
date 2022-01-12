@@ -151,9 +151,12 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 
 
     try {
-
-        db.collection('admin').where("id", "==", req.params.adminID)
-
+        console.log(req.params.adminID)
+        if (!(await db.collection('admin').where("id", "==", req.params.adminID).get()).empty) {
+            console.log("admin checked correctly")
+        } else {
+            return res.status.apply(401).json({ error: "Not authorized" })
+        }
 
         var query = db.collection('tickets')
 
@@ -178,6 +181,7 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
             ticketID: doc.id
         }))
 
+        console.log(response)
 
         return res.send(JSON.stringify(response))
 
@@ -187,8 +191,25 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 })
 
 
+//Si es el rol inquilino:
+//Ver todos los tickets asignados a él que sean de solicitud
+//Ver todos los tickets asignados a él que sean aceptados. Al pinchar en un ticket a parte de los datos del ticket tambien le salen los datos del trabajador.
+app.get('/api/tickets', async (req, res) => {
+    try {
+        var query = db.collection("tickets")
 
+        if (req.query.state) {
+            query = query.where("state", "==", req.query.state)
+        }
 
+        if (req.query.type) {
+            query = query.where("type", "==", req.query.type)
+        }
+
+    } catch (e) {
+        return res.status(500).json({ error: e })
+    }
+})
 
 //get all worker tickets with state acepted
 // Worker is at dashboard and wants too see all tickets he's accepeted or done
@@ -215,46 +236,19 @@ app.get('/api/tickets/state/:state/type/:type/workerID/:workerID', async (req, r
     }
 })
 
-//get all tickets with state and type
-// Worker is at dashboard and wants to see tickets to accept
-// Worker wants to see all tickets with state "solicitar" and type "limpieza"
-http://localhost:5000/api/tickets/state/solicitar/type/limpieza
-app.get('/api/tickets/state/:state/type/:type', async (req, res) => {
 
-    try {
-        const query = db.collection('tickets')
-            .where("state", "==", req.params.state)
-            .where("type", "==", req.params.type);
-
-        const querySnapshot = await query.get();
-
-        const docs = querySnapshot.docs;
-
-        const response = docs.map(doc => ({
-            apartmentID: doc.data().apartmentID,
-            state: doc.data().state,
-            type: doc.data().type
-        }))
-
-        console.log("Acceso a todos los usuarios")
-        return res.send(JSON.stringify(response))
-
-    } catch (error) {
-        return res.send("ERROR")
-    }
-})
 
 
 
 //get all tickets with state
 // Example: teneant wants to see all tickets he's created with state "solicitar"
 http://localhost:5000/api/tickets/state/solicitar/tenantID/CPNDFv5mzwfCKnyj4dvTBdq5FLz1
-app.get('/api/tickets/state/:state/tenantID/:tenantID', async (req, res) => {
+app.get('/api/tickets/tenantID/:tenantID', async (req, res) => {
 
     try {
 
         const query = db.collection('tickets')
-            .where("state", "==", req.params.state)
+            .where("state", "==", req.query.state)
             .where("tenantID", "==", req.params.tenantID)
 
         const querySnapshot = await query.get();
@@ -262,18 +256,14 @@ app.get('/api/tickets/state/:state/tenantID/:tenantID', async (req, res) => {
         const docs = querySnapshot.docs;
 
         const response = docs.map(doc => ({
-            id: doc.id,
-            apartmentID: doc.data().apartmentID,
-            state: doc.data().state,
-            tenantID: doc.data().tenantID,
-            type: doc.data().type
-
+            ...doc.data(),
+            ticketID: doc.id
         }))
 
-        return res.send(JSON.stringify(response))
+        return res.status(200).json(response)
 
-    } catch (error) {
-        return res.send("ERROR")
+    } catch (e) {
+        return res.status(500).send({ error: e })
     }
 })
 
@@ -507,7 +497,7 @@ app.post('/api/signUp/userID/:userID', async (req, res) => {
         return res.status(200).send(JSON.stringify(user))
 
     } catch (e) {
-        return res.json({ error: e })
+        return res.status(500).json({ error: e })
     }
 
 
