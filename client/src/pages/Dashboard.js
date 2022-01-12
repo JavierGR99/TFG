@@ -5,6 +5,7 @@ import { Link, useHistory } from "react-router-dom"
 import { auth } from "../firebase"
 import { getTicket } from "../service/getTicket"
 import Tickets from '../components/Tickets'
+import { getRole } from "../service/getRole"
 
 export default function Dashboard() {
   const [error, setError] = useState("")
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [reqTickets, setReqTickets] = useState([])
   const [acptTickets, setAcptTickets] = useState([])
   const [doneTickets, setDoneTickets] = useState([])
+  const [role, setRole] = useState([])
 
   const adminID = auth.currentUser.uid
 
@@ -30,21 +32,25 @@ export default function Dashboard() {
 
   async function setup() {
 
+    const role = await getRole({
+      userID: adminID
+    })
+
+    setRole(role)
+
     setAcptTickets(await getTicket({
       state: "accepted",
-      adminID: adminID,
+      role: role,
     }))
 
     setReqTickets(await getTicket({
       state: "requested",
-      adminID: adminID,
+      role: role,
     }))
-
-
 
     setDoneTickets(await getTicket({
       state: "done",
-      adminID: adminID,
+      role: role,
     }))
 
   }
@@ -54,7 +60,6 @@ export default function Dashboard() {
   useEffect(() => {
 
     setup()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -84,6 +89,7 @@ export default function Dashboard() {
       <Tickets state={"SOLICITADOS"} tickets={reqTickets}></Tickets>
       <Tickets state={"ACEPTADOS"} tickets={acptTickets}></Tickets>
       <Tickets state={"REALIZADOS"} tickets={doneTickets}></Tickets>
+      {/* {role === "admin" && <Tickets state={"REALIZADOS"} tickets={doneTickets}></Tickets>} */}
 
       <Link to="/NewTicket" className="btn btn-primary w-100 mt-3">
         Create new ticket

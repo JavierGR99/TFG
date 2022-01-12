@@ -4,7 +4,6 @@ class Middleware {
     async decodeToken(req, res, next) {
 
         if (req.url.includes("/api/signUp")) {
-            console.log("se mete")
             return next()
         } else {
 

@@ -15,7 +15,7 @@ const middleware = require('./middleware');
 
 app.use(cors());
 
-app.use(middleware.decodeToken);
+// app.use(middleware.decodeToken);
 
 app.listen(port, () => {
     console.log('server is running on port ' + port)
@@ -23,6 +23,24 @@ app.listen(port, () => {
 
 
 // ************** USERS ****************
+
+app.get('/api/rol/userID/:userID', async (req, res) => {
+
+    try {
+        db.collection('users')
+            .where("id", "==", req.params.userID)
+            .get()
+            .then(querySnapshot => {
+                if (!querySnapshot.empty) {
+                    let role = querySnapshot.docs[0].data().role
+                    return res.status(200).send(role)
+                }
+            })
+
+    } catch (e) {
+        res.status(500).send({ error: error.message });
+    }
+})
 
 //get a single contact
 app.get('/api/users/:userId', (req, res) => {
@@ -475,18 +493,16 @@ app.get('/api/workers/:workerID', async (req, res) => {
 
 app.post('/api/signUp/userID/:userID', async (req, res) => {
 
-    console.log("me meto 1")
-    console.log(req.params.userID)
     try {
         const user = {
             id: req.params.userID,
             role: "tenant"
         }
 
-        console.log("me meto 2")
+
 
         db.collection('users').add(user)
-        console.log("User registered succesfully: " + user)
+        console.log("User registered succesfully: " + JSON.stringify(user))
 
         return res.status(200).send(JSON.stringify(user))
 
@@ -496,6 +512,12 @@ app.post('/api/signUp/userID/:userID', async (req, res) => {
 
 
 })
+
+
+
+
+
+
 
 
 

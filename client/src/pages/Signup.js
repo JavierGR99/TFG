@@ -27,8 +27,6 @@ export default function Signup() {
       const postUser = await postSignUp({
         userID: userId
       })
-      console.log(postUser)
-
       history.push("/login")
     } catch {
       setError("Failed to create an account")
