@@ -15,10 +15,11 @@ function Tickets({ tickets, state }) {
                             <ul key={t.ticketID}>
                                 <span>Type: {t.type}</span>
                                 <br />
-                                <span>ApartmentID : {t.apartmentID}</span>
+                                <span>Apartment : {t.aptName} {t.aptNumber} </span>
                                 <br />
                                 <span>Description : {t.description}</span>
                                 <br />
+                                <span></span>
                             </ul>
 
                         )
