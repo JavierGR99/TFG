@@ -13,7 +13,7 @@ import ApartmentsSelect from '../components/ApartmentsSelect'
 
 function NewTicket() {
 
-    const timeRef = useRef(null)
+    // const timeRef = useRef(null)
     const aptRef = createRef("")
     const workerRef = useRef(null)
     const typeRef = useRef("")

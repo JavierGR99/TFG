@@ -70,17 +70,45 @@ app.get('/api/tickets/workerID/:workerID', async (req, res) => {
             query = query.where("worker", "==", req.params.workerID)
         }
 
-
-
-
-
         const querySnapshot = await query.get();
 
-        const docs = querySnapshot.docs;
+        const tickets = querySnapshot.docs;
 
-        const response = docs.map(doc => ({
-            ...doc.data(),
-            ticketID: doc.id
+        const response = await Promise.all(tickets.map(async doc => {
+            const aptID = await doc.data().apartmentID
+            const aptData = await db.collection('apartaments').doc(aptID).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        return doc.data()
+                    }
+                })
+
+            if (doc.data().worker) {
+                const worker = await db.collection('workers').doc(doc.data().worker).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            return doc.data().name
+                        }
+                    })
+                return {
+                    ...doc.data(),
+                    aptBlock: aptData.block,
+                    aptName: aptData.name,
+                    aptNumber: aptData.number,
+                    worker,
+                    ticketID: doc.id
+                }
+            }
+
+
+
+            return {
+                ...doc.data(),
+                aptBlock: aptData.block,
+                aptName: aptData.name,
+                aptNumber: aptData.number,
+                ticketID: doc.id
+            }
         }))
 
         return res.status(200).json(response)
@@ -108,11 +136,26 @@ app.get('/api/tickets/tenantID/:tenantID', async (req, res) => {
 
         const querySnapshot = await query.get();
 
-        const docs = querySnapshot.docs;
+        const tickets = querySnapshot.docs;
 
-        const response = docs.map(doc => ({
-            ...doc.data(),
-            ticketID: doc.id
+        const response = await Promise.all(tickets.map(async doc => {
+            const aptID = await doc.data().apartmentID
+            const aptData = await db.collection('apartaments').doc(aptID).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        return doc.data()
+                    }
+                })
+
+
+
+            return {
+                ...doc.data(),
+                aptBlock: aptData.block,
+                aptName: aptData.name,
+                aptNumber: aptData.number,
+                ticketID: doc.id
+            }
         }))
 
         return res.status(200).json(response)
@@ -149,15 +192,19 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 
         const querySnapshot = await query.get();
 
-        const docs = querySnapshot.docs;
+        const tickets = querySnapshot.docs;
 
-        // const response = docs.map(doc => ({
-        //     ...doc.data(),
-        //     ticketID: doc.id
-        // }))
+        // const response = tickets.map(doc => {
+        //     return {
+        //         ...doc.data(),
+        //         ticketID: doc.id
+        //     }
+        // })
 
-        var response = {}
-        docs.map(async doc => {
+
+
+
+        const response = await Promise.all(tickets.map(async doc => {
             const aptID = await doc.data().apartmentID
             const aptData = await db.collection('apartaments').doc(aptID).get()
                 .then((doc) => {
@@ -166,18 +213,19 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
                     }
                 })
 
-            response = JSON.stringify({
+
+
+            return {
                 ...doc.data(),
                 aptBlock: aptData.block,
                 aptName: aptData.name,
-                aptNumer: aptData.number,
+                aptNumber: aptData.number,
                 ticketID: doc.id
-            })
+            }
+        }))
 
-        })
 
-
-        console.log(response)
+        // console.log(response)
 
 
         return res.status(200).json(response)
@@ -323,11 +371,23 @@ app.get('/api/workers/', async (req, res) => {
 
         const docs = querySnapshot.docs;
 
-        const response = docs.map(doc => ({
-            id: doc.data().id,
-            name: doc.data().name,
-            type: doc.data().type
+        const response = await Promise.all(docs.map(async doc => {
+            console.log()
+            const workerName = await db.collection('users').where("id", "==", doc.data().id)
+                .get()
+                .then(querySnapshot => {
+                    if (!querySnapshot.empty) {
+                        return querySnapshot.docs[0].data().userName
+                    }
+                })
+
+            return {
+                id: doc.data().id,
+                type: doc.data().type,
+                name: workerName
+            }
         }))
+
 
         return res.send(JSON.stringify(response))
 
@@ -345,8 +405,11 @@ app.post('/api/signUp/userID/:userID', async (req, res) => {
     try {
         const user = {
             id: req.params.userID,
-            role: "tenant"
+            role: "tenant",
+            userName: req.query.userName
         }
+
+        console.log(user)
 
 
 

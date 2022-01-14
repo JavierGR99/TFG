@@ -14,7 +14,6 @@ export default function Dashboard() {
   const [reqTickets, setReqTickets] = useState([])
   const [acptTickets, setAcptTickets] = useState([])
   const [doneTickets, setDoneTickets] = useState([])
-  const [role, setRole] = useState([])
 
   const userID = auth.currentUser.uid
 
@@ -35,8 +34,6 @@ export default function Dashboard() {
     const role = await getRole({
       userID: userID
     })
-
-    setRole(role)
 
     setAcptTickets(await getTicket({
       state: "accepted",
@@ -68,11 +65,6 @@ export default function Dashboard() {
     setup()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-
-
-
-
 
   return (
     <>

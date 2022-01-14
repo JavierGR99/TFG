@@ -8,6 +8,7 @@ export default function Signup() {
   const emailRef = useRef()
   const passwordRef = useRef()
   const passwordConfirmRef = useRef()
+  const userNameRef = useRef()
   const { signup } = useAuth()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -15,6 +16,8 @@ export default function Signup() {
 
   async function handleSubmit(e) {
     e.preventDefault()
+
+    console.log(userNameRef.current.value)
 
     if (passwordRef.current.value !== passwordConfirmRef.current.value) {
       return setError("Passwords do not match")
@@ -24,11 +27,12 @@ export default function Signup() {
       setError("")
       setLoading(true)
       const userId = await signup(emailRef.current.value, passwordRef.current.value)
-      const postUser = await postSignUp({
-        userID: userId
+      await postSignUp({
+        userID: userId,
+        userName: userNameRef.current.value
       })
-      history.push("/login")
-    } catch {
+      // history.push("/login")
+    } catch (error) {
       setError("Failed to create an account")
     }
 
@@ -42,6 +46,10 @@ export default function Signup() {
           <h2 className="text-center mb-4">Sign Up</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
+            <Form.Group id="userName">
+              <Form.Label>User Name</Form.Label>
+              <Form.Control type="text" ref={userNameRef} placeholder="Javier Gallego" required />
+            </Form.Group>
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
               <Form.Control type="email" ref={emailRef} required />
