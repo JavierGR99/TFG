@@ -12,6 +12,7 @@ import UpdateProfile from "../pages/UpdateProfile"
 import Signup from "../pages/Signup"
 import Login from "../pages/Login"
 import TicketDetails from "../pages/TicketDetails"
+import EditTicket from "../pages/EditTicket"
 
 function App() {
 
@@ -29,8 +30,9 @@ function App() {
               <Route path="/signup" component={Signup} />
               <Route path="/login" component={Login} />
               <Route path="/forgot-password" component={ForgotPassword} />
-              <Router path="/ticket-details"> <TicketDetails /></Router>
+              <Route path="/ticket-details" component={TicketDetails} />
               <Route path="/newTicket" component={NewTicket} />
+              <Route path="/editTicket" component={EditTicket} />
 
             </Switch>
           </AuthProvider>

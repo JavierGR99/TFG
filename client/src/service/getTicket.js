@@ -15,25 +15,16 @@ export async function getTicket(props) {
         url = `http://localhost:5000/api/tickets/workerID/${props.userID}?state=${props.state}`
     }
 
-    if (props.type) {
-        url = url + `&type=${props.type}`
-    }
-
-
-
-
-
     return await axios.get(url, {
         headers: {
             Authorization: 'Bearer ' + userToken,
         },
     }).then(response => {
-
         return response.data
 
     }).catch(error => {
 
-        if (error.response.data.error) {
+        if (error.response.data) {
             return []
         }
 

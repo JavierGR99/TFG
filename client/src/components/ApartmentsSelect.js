@@ -3,6 +3,7 @@ import React from 'react'
 function ApartmentsSelect(props, ref) {
 
     function aptChange(e) {
+        console.log(ref.current.value)
         ref.current.value = e.target.value
     }
 

@@ -1,20 +1,19 @@
 import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom';
 
 
-
-function TicketDetails() {
+function EditTicket() {
     let location = useLocation()
     const { ticket } = location.state || [];
     console.log(location)
 
-
-
     return (
         <div>
-            <h1>TICKET DETAILS</h1>
+            <h1>EDIT TICKET</h1>
+
             {
                 ticket &&
+
                 <div>
                     <div>
                         <p>Apartment: {ticket.aptName} {ticket.aptNumber} </p>
@@ -33,7 +32,7 @@ function TicketDetails() {
                     </div>
 
                     {
-                        ticket.workerName &&
+                        ticket.worker &&
                         <div>
                             <p>Worker: {ticket.workerName}</p>
                         </div>
@@ -51,7 +50,8 @@ function TicketDetails() {
 
                         ticket.tenantName ? (
                             <div>
-                                <p>Tenant: {ticket.tenantName}</p>
+                                <p>Tenant: </p>
+                                <input type="text" value={ticket.tenantName}></input>
                             </div>
                         ) : (
                             <div>
@@ -62,14 +62,6 @@ function TicketDetails() {
 
                     <div>
                         <button type="button" className="btn btn-danger mr-5" >Remove ticket</button>
-
-                        <Link to={{
-                            pathname: `/editTicket`,
-                            state: {
-                                ticket: ticket
-                            }
-                        }}>Edit ticket</Link>
-
                     </div>
                 </div>
             }
@@ -85,4 +77,4 @@ function TicketDetails() {
     )
 }
 
-export default TicketDetails
+export default EditTicket

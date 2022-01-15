@@ -24,7 +24,9 @@ export default function Login() {
     } catch {
       setError("Failed to log in")
     }
-    setLoading(false)
+
+    // No sirve para nada porque en el context al cambiar el userOnchange pone el setLoading(false)
+    // setLoading(false)
   }
 
   return (

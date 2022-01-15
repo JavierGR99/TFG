@@ -3,16 +3,12 @@ import { Link } from 'react-router-dom'
 
 function Tickets({ tickets, state }) {
 
-    const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
-        setLoading(false)
-    }, [tickets])
     return (
         <div>
             <span>TICKETS {state}</span>
             {
-                loading ? (
+                tickets.length === 0 ? (
                     <div> No tickets available </div>
                 ) : (
                     tickets.map((t) => {
@@ -24,7 +20,6 @@ function Tickets({ tickets, state }) {
                                 <br />
                                 <span>Description : {t.description}</span>
                                 <br />
-                                <span></span>
                                 <Link to={{
                                     pathname: `/ticket-details`,
                                     state: {

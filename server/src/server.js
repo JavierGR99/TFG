@@ -16,7 +16,7 @@ const { json } = require('express');
 
 app.use(cors());
 
-// app.use(middleware.decodeToken);
+app.use(middleware.decodeToken);
 
 app.listen(port, () => {
     console.log('server is running on port ' + port)
@@ -49,13 +49,14 @@ app.get('/api/rol/userID/:userID', async (req, res) => {
 
 app.get('/api/tickets/workerID/:workerID', async (req, res) => {
 
+
     try {
 
+        /// Example: runner wants to see tickets type runner and not cleaning
         const type = await db.collection('workers').where("id", "==", req.params.workerID)
             .get()
             .then(querySnapshot => {
                 if (!querySnapshot.empty) {
-                    console.log(querySnapshot.docs[0].data().type)
                     return querySnapshot.docs[0].data().type
                 }
             })
@@ -66,7 +67,7 @@ app.get('/api/tickets/workerID/:workerID', async (req, res) => {
             .where("type", "==", type)
             .where("state", "==", req.query.state)
 
-        if (req.params.state === "requested") {
+        if (req.query.state != "requested") {
             query = query.where("worker", "==", req.params.workerID)
         }
 
@@ -83,33 +84,51 @@ app.get('/api/tickets/workerID/:workerID', async (req, res) => {
                     }
                 })
 
-            if (doc.data().worker) {
-                const worker = await db.collection('workers').doc(doc.data().worker).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            return doc.data().name
+
+            const createdByName = await db.collection('users').where("id", "==", doc.data().createdBy)
+                .get()
+                .then(querySnapshot => {
+                    if (!querySnapshot.empty) {
+                        return querySnapshot.docs[0].data().userName
+                    }
+                })
+
+            if (doc.data().tenantID) {
+                var tenantName = await db.collection('users')
+                    .where("id", "==", doc.data().tenantID)
+                    .get()
+                    .then(querySnapshot => {
+                        if (!querySnapshot.empty) {
+                            return querySnapshot.docs[0].data().userName
                         }
                     })
-                return {
-                    ...doc.data(),
-                    aptBlock: aptData.block,
-                    aptName: aptData.name,
-                    aptNumber: aptData.number,
-                    worker,
-                    ticketID: doc.id
-                }
             }
 
+            if (doc.data().worker) {
+                var workerName = await db.collection('users')
+                    .where("id", "==", doc.data().worker)
+                    .get()
+                    .then(querySnapshot => {
+                        if (!querySnapshot.empty) {
+                            return querySnapshot.docs[0].data().userName
+                        }
+                    })
+            }
 
-
-            return {
+            const data = {
                 ...doc.data(),
+                tenantName: tenantName,
+                createdByName: createdByName,
                 aptBlock: aptData.block,
                 aptName: aptData.name,
                 aptNumber: aptData.number,
-                ticketID: doc.id
+                workerName: workerName,
+                ticketID: doc.id,
             }
+
+            return data
         }))
+
 
         return res.status(200).json(response)
 
@@ -147,15 +166,48 @@ app.get('/api/tickets/tenantID/:tenantID', async (req, res) => {
                     }
                 })
 
+            const createdByName = await db.collection('users').where("id", "==", doc.data().createdBy)
+                .get()
+                .then(querySnapshot => {
+                    if (!querySnapshot.empty) {
+                        return querySnapshot.docs[0].data().userName
+                    }
+                })
 
+            if (doc.data().tenantID) {
+                var tenantName = await db.collection('users')
+                    .where("id", "==", doc.data().tenantID)
+                    .get()
+                    .then(querySnapshot => {
+                        if (!querySnapshot.empty) {
+                            return querySnapshot.docs[0].data().userName
+                        }
+                    })
+            }
 
-            return {
+            if (doc.data().worker) {
+                var workerName = await db.collection('users')
+                    .where("id", "==", doc.data().worker)
+                    .get()
+                    .then(querySnapshot => {
+                        if (!querySnapshot.empty) {
+                            return querySnapshot.docs[0].data().userName
+                        }
+                    })
+            }
+
+            const data = {
                 ...doc.data(),
+                tenantName: tenantName,
+                createdByName: createdByName,
                 aptBlock: aptData.block,
                 aptName: aptData.name,
                 aptNumber: aptData.number,
-                ticketID: doc.id
+                workerName: workerName,
+                ticketID: doc.id,
             }
+
+            return data
         }))
 
         return res.status(200).json(response)
@@ -168,13 +220,13 @@ app.get('/api/tickets/tenantID/:tenantID', async (req, res) => {
 // ADMIN is at dashboard and wants too see all tickets accepeted or done
 app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 
+
     try {
 
-        if (!(await db.collection('admin').where("id", "==", req.params.adminID).get()).empty) {
-
-        } else {
+        if (db.collection('admin').where("id", "==", req.params.adminID).get().empty) {
             return res.status.apply(401).json({ error: "Not authorized" })
         }
+
 
         var query = db.collection('tickets')
 
@@ -194,16 +246,6 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 
         const tickets = querySnapshot.docs;
 
-        // const response = tickets.map(doc => {
-        //     return {
-        //         ...doc.data(),
-        //         ticketID: doc.id
-        //     }
-        // })
-
-
-
-
         const response = await Promise.all(tickets.map(async doc => {
             const aptID = await doc.data().apartmentID
             const aptData = await db.collection('apartaments').doc(aptID).get()
@@ -213,19 +255,67 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
                     }
                 })
 
+            const createdByName = await db.collection('users').where("id", "==", doc.data().createdBy)
+                .get()
+                .then(querySnapshot => {
+                    if (!querySnapshot.empty) {
+                        return querySnapshot.docs[0].data().userName
+                    }
+                })
 
 
-            return {
+            if (doc.data().tenantID) {
+                var tenantName = await db.collection('users')
+                    .where("id", "==", doc.data().tenantID)
+                    .get()
+                    .then(querySnapshot => {
+                        if (!querySnapshot.empty) {
+                            return querySnapshot.docs[0].data().userName
+                        }
+                    })
+            }
+
+
+
+
+            if (doc.data().worker) {
+                var workerName = await db.collection('users')
+                    .where("id", "==", doc.data().worker)
+                    .get()
+                    .then(querySnapshot => {
+                        if (!querySnapshot.empty) {
+                            return querySnapshot.docs[0].data().userName
+                        }
+                    })
+            }
+
+
+            const data = {
                 ...doc.data(),
+                tenantName: tenantName,
+                createdByName: createdByName,
                 aptBlock: aptData.block,
                 aptName: aptData.name,
                 aptNumber: aptData.number,
-                ticketID: doc.id
+                workerName: workerName,
+                ticketID: doc.id,
             }
+
+
+            return data
+
+
+
+
+
+
+
+
+
         }))
 
 
-        // console.log(response)
+        console.log(response)
 
 
         return res.status(200).json(response)
@@ -235,31 +325,6 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
     }
 })
 
-
-
-app.get('/api/tickets/workerID/:workerID', async (req, res) => {
-
-    try {
-
-        const query = db.collection('tickets')
-            .where("state", "==", req.query.state)
-            .where("workerID", "==", req.params.workerID)
-
-        const querySnapshot = await query.get();
-
-        const docs = querySnapshot.docs;
-
-        const response = docs.map(doc => ({
-            ...doc.data(),
-            ticketID: doc.id
-        }))
-
-        return res.status(200).json(response)
-
-    } catch (e) {
-        return res.status(500).send({ error: e })
-    }
-})
 
 
 //ADMIN CREATES NEW TICKET 
@@ -372,7 +437,7 @@ app.get('/api/workers/', async (req, res) => {
         const docs = querySnapshot.docs;
 
         const response = await Promise.all(docs.map(async doc => {
-            console.log()
+
             const workerName = await db.collection('users').where("id", "==", doc.data().id)
                 .get()
                 .then(querySnapshot => {

@@ -10,7 +10,6 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState()
   const [loading, setLoading] = useState(true)
-  const [token, setToken] = useState()
 
   async function signup(email, password) {
     const docRef = await auth.createUserWithEmailAndPassword(email, password)
@@ -54,8 +53,6 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
-    setToken,
-    token,
     login,
     signup,
     logout,

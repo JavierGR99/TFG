@@ -15,7 +15,7 @@ export default function Dashboard() {
   const [acptTickets, setAcptTickets] = useState([])
   const [doneTickets, setDoneTickets] = useState([])
 
-  const userID = auth.currentUser.uid
+  const userID = currentUser.uid
 
 
   async function handleLogout() {
@@ -31,29 +31,29 @@ export default function Dashboard() {
 
   async function setup() {
 
+
     const role = await getRole({
       userID: userID
     })
-
-    setAcptTickets(await getTicket({
-      state: "accepted",
-      userID: userID,
-      role: role,
-      // type: "cleaning"
-    }))
 
     setReqTickets(await getTicket({
       state: "requested",
       userID: userID,
       role: role,
-      // type: "cleaning"
     }))
+
+    setAcptTickets(await getTicket({
+      state: "accepted",
+      userID: userID,
+      role: role,
+    }))
+
+
 
     setDoneTickets(await getTicket({
       state: "done",
       userID: userID,
       role: role,
-      // type: "cleaning"
     }))
 
   }
@@ -88,7 +88,6 @@ export default function Dashboard() {
       <Tickets state={"SOLICITADOS"} tickets={reqTickets}></Tickets>
       <Tickets state={"ACEPTADOS"} tickets={acptTickets}></Tickets>
       <Tickets state={"REALIZADOS"} tickets={doneTickets}></Tickets>
-      {/* {role === "admin" && <Tickets state={"REALIZADOS"} tickets={doneTickets}></Tickets>} */}
 
       <Link to="/NewTicket" className="btn btn-primary w-100 mt-3">
         Create new ticket

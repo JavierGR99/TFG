@@ -9,6 +9,9 @@ import TypeSelect from '../components/TypeSelect'
 import WorkersSelect from '../components/WorkersSelect'
 import TimeChoose from '../components/TimeChoose'
 import ApartmentsSelect from '../components/ApartmentsSelect'
+import { useAuth } from '../contexts/AuthContext'
+import { getRole } from '../service/getRole'
+
 
 
 function NewTicket() {
@@ -22,6 +25,9 @@ function NewTicket() {
     const [apts, setApts] = useState([])
     const [workers, setWorkers] = useState([])
     const history = useHistory()
+    const { currentUser } = useAuth()
+
+    const userID = currentUser.uid
 
     const typeOfTickets = [
         { id: 1, type: "cleaning" },
@@ -36,6 +42,13 @@ function NewTicket() {
     ]
 
     async function setup() {
+        //Comprobar si el rol es tenant coger el apartamento que tiene asignado y no un sel
+        const role = await getRole({
+            userID: userID
+        })
+        if (role === "tenant") {
+
+        }
         setApts(await getApartments())
     }
 
