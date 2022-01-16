@@ -30,10 +30,9 @@ function App() {
               <Route path="/signup" component={Signup} />
               <Route path="/login" component={Login} />
               <Route path="/forgot-password" component={ForgotPassword} />
-              <Route path="/ticket-details" component={TicketDetails} />
-              <Route path="/newTicket" component={NewTicket} />
-              <Route path="/editTicket" component={EditTicket} />
-
+              <PrivateRoute path="/ticket-details" component={TicketDetails} />
+              <PrivateRoute path="/newTicket" component={NewTicket} />
+              <PrivateRoute path="/editTicket" component={EditTicket} />
             </Switch>
           </AuthProvider>
         </Router>

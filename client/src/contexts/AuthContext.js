@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react"
 import { auth } from "../firebase"
+import { postSignUp } from "../service/postSignUp"
 
 const AuthContext = React.createContext()
 
@@ -10,10 +11,24 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState()
   const [loading, setLoading] = useState(true)
+  const [token, setToken] = useState()
 
-  async function signup(email, password) {
-    const docRef = await auth.createUserWithEmailAndPassword(email, password)
-    return docRef.user.uid
+  async function signup(email, password, userName, aptID) {
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(doc => {
+        console.log(doc.user.uid)
+        console.log(userName)
+        console.log(aptID)
+        postSignUp({
+          userID: doc.user.uid,
+          userName: userName,
+          apartmentID: aptID,
+        })
+      }).catch(function (error) {
+        return error
+      })
+
   }
 
   function login(email, password) {
@@ -53,6 +68,8 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
+    setToken,
+    token,
     login,
     signup,
     logout,
