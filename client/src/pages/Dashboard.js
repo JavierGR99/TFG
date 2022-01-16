@@ -30,32 +30,39 @@ export default function Dashboard() {
 
 
   async function setup() {
+    try {
+      const role = await getRole({
+        userID: userID
+      })
+
+      if (role === "Unauthorized") {
+        history.push("/login")
+      }
 
 
-    const role = await getRole({
-      userID: userID
-    })
+      setReqTickets(await getTicket({
+        state: "requested",
+        userID: userID,
+        role: role,
+      }))
 
-    setReqTickets(await getTicket({
-      state: "requested",
-      userID: userID,
-      role: role,
-    }))
-
-    setAcptTickets(await getTicket({
-      state: "accepted",
-      userID: userID,
-      role: role,
-    }))
+      setAcptTickets(await getTicket({
+        state: "accepted",
+        userID: userID,
+        role: role,
+      }))
 
 
 
-    setDoneTickets(await getTicket({
-      state: "done",
-      userID: userID,
-      role: role,
-    }))
+      setDoneTickets(await getTicket({
+        state: "done",
+        userID: userID,
+        role: role,
+      }))
 
+    } catch (error) {
+      setError(error)
+    }
   }
 
 
@@ -88,6 +95,8 @@ export default function Dashboard() {
       <Tickets state={"SOLICITADOS"} tickets={reqTickets}></Tickets>
       <Tickets state={"ACEPTADOS"} tickets={acptTickets}></Tickets>
       <Tickets state={"REALIZADOS"} tickets={doneTickets}></Tickets>
+
+
 
       <Link to="/NewTicket" className="btn btn-primary w-100 mt-3">
         Create new ticket

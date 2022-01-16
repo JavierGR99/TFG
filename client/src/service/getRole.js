@@ -17,7 +17,7 @@ export async function getRole(props) {
     }).catch(error => {
 
         if (error.response.data.error) {
-            return []
+            return "Unauthorized"
         }
 
     })

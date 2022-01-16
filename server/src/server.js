@@ -34,6 +34,7 @@ app.get('/api/rol/userID/:userID', async (req, res) => {
             .get()
             .then(querySnapshot => {
                 if (!querySnapshot.empty) {
+                    console.log("me meto")
                     let role = querySnapshot.docs[0].data().role
                     return res.status(200).send(role)
                 }
@@ -471,12 +472,20 @@ app.post('/api/signUp/userID/:userID', async (req, res) => {
         const user = {
             id: req.params.userID,
             role: "tenant",
-            userName: req.query.userName
+            userName: req.query.userName,
+        }
+
+        const tenant = {
+            userID: req.params.userID,
+            aptarmentID: req.query.aptID,
+            state: "active"
         }
 
         console.log(user)
+        console.log(tenant)
 
-
+        db.collection('tenants').add(tenant)
+        console.log("Tenant registered succesfully: " + JSON.stringify(tenant))
 
         db.collection('users').add(user)
         console.log("User registered succesfully: " + JSON.stringify(user))
@@ -484,6 +493,7 @@ app.post('/api/signUp/userID/:userID', async (req, res) => {
         return res.status(200).send(JSON.stringify(user))
 
     } catch (e) {
+        console.log(e)
         return res.status(500).json({ error: e })
     }
 
