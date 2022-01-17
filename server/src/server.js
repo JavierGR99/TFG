@@ -275,9 +275,6 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
                     })
             }
 
-
-
-
             if (doc.data().worker) {
                 var workerName = await db.collection('users')
                     .where("id", "==", doc.data().worker)
@@ -288,8 +285,6 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
                         }
                     })
             }
-
-
             const data = {
                 ...doc.data(),
                 tenantName: tenantName,
@@ -300,15 +295,8 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
                 workerName: workerName,
                 ticketID: doc.id,
             }
-
-
             return data
         }))
-
-
-
-
-
         return res.status(200).json(response)
 
     } catch (error) {
@@ -376,6 +364,22 @@ app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
     //Check if admin is correct
 
 
+})
+
+
+app.delete('api/tickets/:ticketID/userID/:userID', async (req, res) => {
+
+    //Coger el id del usuario y comprobar si tiene rol worker o admin
+    //Coger el id del ticket y borrarlo
+    console.log(req.params.ticketID)
+    console.log("borrar")
+    try {
+        db.collection("tickets").doc(req.params.ticketID).delete
+        console.log("Ticket removed")
+        return res.status(200).json("Ticket deleted correctly")
+    } catch (error) {
+        return res.status(400).send('Ticket no created, there was a problem')
+    }
 })
 
 // ********** APARTAMENTS ************

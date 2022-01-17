@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [reqTickets, setReqTickets] = useState([])
   const [acptTickets, setAcptTickets] = useState([])
   const [doneTickets, setDoneTickets] = useState([])
+  const [userRol, setUserRol] = useState("tenant")
 
   const userID = currentUser.uid
 
@@ -37,6 +38,7 @@ export default function Dashboard() {
         history.push("/login")
       }
 
+      setUserRol(role)
 
       setReqTickets(await getTicket({
         state: "requested",
@@ -89,9 +91,9 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      <Tickets state={"SOLICITADOS"} tickets={reqTickets}></Tickets>
-      <Tickets state={"ACEPTADOS"} tickets={acptTickets}></Tickets>
-      <Tickets state={"REALIZADOS"} tickets={doneTickets}></Tickets>
+      <Tickets state={"SOLICITADOS"} role={userRol} userID={userID} tickets={reqTickets}></Tickets>
+      <Tickets state={"ACEPTADOS"} role={userRol} userID={userID} tickets={acptTickets}></Tickets>
+      <Tickets state={"REALIZADOS"} role={userRol} userID={userID} tickets={doneTickets}></Tickets>
 
 
 

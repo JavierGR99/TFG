@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-function Tickets({ tickets, state }) {
-
-
+function Tickets(props) {
     return (
         <div>
-            <span>TICKETS {state}</span>
+            <span>TICKETS {props.state}</span>
             {
-                tickets.length === 0 ? (
+                props.tickets.length === 0 ? (
                     <div> No tickets available </div>
                 ) : (
-                    tickets.map((t) => {
+                    props.tickets.map((t) => {
                         return (
                             <div key={t.ticketID}>
                                 <span>Type: {t.type} </span>
@@ -23,7 +21,9 @@ function Tickets({ tickets, state }) {
                                 <Link to={{
                                     pathname: `/ticket-details`,
                                     state: {
-                                        ticket: t
+                                        ticket: t,
+                                        userID: props.userID,
+                                        role: props.role
                                     }
                                 }}>View Details</Link>
                             </div>
