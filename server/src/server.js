@@ -34,7 +34,6 @@ app.get('/api/rol/userID/:userID', async (req, res) => {
             .get()
             .then(querySnapshot => {
                 if (!querySnapshot.empty) {
-                    console.log("me meto")
                     let role = querySnapshot.docs[0].data().role
                     return res.status(200).send(role)
                 }
@@ -304,19 +303,10 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 
 
             return data
-
-
-
-
-
-
-
-
-
         }))
 
 
-        console.log(response)
+
 
 
         return res.status(200).json(response)
@@ -335,52 +325,56 @@ app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
     //IF USER IS TENANT THEN tenant: req.params.userID
     //IF USER IS ADMIN THEN search the actual tenant who's in the apartment
     //and put it automatically
+    try {
+        if (db.collection('admin').where("id", "==", req.params.adminID)) {
 
+        } else {
+            return res.status.apply(401).json({ error: "Not authorized" })
+        }
+
+        var queryTeanant = db.collection('tenants')
+            .where("apartmentID", "==", req.query.apartmentID)
+            .where("state", "==", "active")
+
+
+        const querySnapshot = await queryTeanant.get();
+        var tenant = ""
+
+        if (querySnapshot.empty) {
+            console.log("NO TEANANT active in the APARTMENT")
+        } else {
+            console.log("TEANANT is active in the APARTMENT")
+            const docs = querySnapshot.docs;
+
+            tenant = docs[0].data().userID;
+        }
+
+        var newTicket = {
+            ...req.body,
+            tenantID: tenant
+        }
+
+
+
+        db.collection('tickets').add(newTicket).
+            then(function (docRef) {
+                newTicket = {
+                    ...newTicket,
+                    ticketID: docRef.id
+                }
+                console.log("Ticket added correctyly: ")
+                console.log(newTicket)
+
+            })
+
+
+
+        return res.status(201).send('Ticket added correctly' + "\n" + JSON.stringify(newTicket))
+    } catch (error) {
+        return res.status(400).send('Ticket no created, there was a problem')
+    }
     //Check if admin is correct
-    if (db.collection('admin').where("id", "==", req.params.adminID)) {
 
-    } else {
-        return res.status.apply(401).json({ error: "Not authorized" })
-    }
-
-    var queryTeanant = db.collection('tenants')
-        .where("apartmentID", "==", req.body.apartmentID)
-        .where("state", "==", "active")
-
-
-    const querySnapshot = await queryTeanant.get();
-    var tenant = ""
-
-    if (querySnapshot.empty) {
-        console.log("NO TEANANT active in the APARTMENT")
-    } else {
-        console.log("TEANANT is active in the APARTMENT")
-        const docs = querySnapshot.docs;
-
-        tenant = docs[0].data().userID;
-    }
-
-    var newTicket = {
-        ...req.body,
-        tenantID: tenant
-    }
-
-
-
-    db.collection('tickets').add(newTicket).
-        then(function (docRef) {
-            newTicket = {
-                ...newTicket,
-                ticketID: docRef.id
-            }
-            console.log("Ticket added correctyly: ")
-            console.log(newTicket)
-
-        })
-
-
-
-    return res.status(201).send('Ticket added correctly' + "\n" + JSON.stringify(newTicket))
 
 })
 
@@ -595,7 +589,6 @@ app.delete('/api/users/:userId', (req, res) => {
 //get all users
 app.get('/api/users', async (req, res) => {
 
-    console.log("Acceso a todos los usuarios")
 
     try {
         const query = db.collection('users');
