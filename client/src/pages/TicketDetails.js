@@ -6,7 +6,8 @@ import { Link, useLocation } from 'react-router-dom'
 function TicketDetails() {
     let location = useLocation()
     const { ticket } = location.state || [];
-    console.log(location)
+    const { role } = location.state || "tenant";
+
 
 
 
@@ -62,7 +63,10 @@ function TicketDetails() {
 
                     <div>
                         <button type="button" className="btn btn-danger mr-5" >Remove ticket</button>
-
+                        {
+                            role === "worker" &&
+                            <button type="button" className="btn btn-danger mr-5" > Accept ticket</button>
+                        }
                         <Link to={{
                             pathname: `/editTicket`,
                             state: {

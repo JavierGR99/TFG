@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 import { Card, Button, Alert } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { Link, useHistory } from "react-router-dom"
-import { auth } from "../firebase"
 import { getTicket } from "../service/getTicket"
 import Tickets from '../components/Tickets'
 import { getRole } from "../service/getRole"
@@ -16,7 +15,6 @@ export default function Dashboard() {
   const [doneTickets, setDoneTickets] = useState([])
 
   const userID = currentUser.uid
-
 
   async function handleLogout() {
     setError("")
@@ -51,9 +49,6 @@ export default function Dashboard() {
         userID: userID,
         role: role,
       }))
-
-
-
       setDoneTickets(await getTicket({
         state: "done",
         userID: userID,
@@ -61,7 +56,9 @@ export default function Dashboard() {
       }))
 
     } catch (error) {
-      setError(error)
+      if (!error.status) {
+        window.alert("Network Error, try to reset the app")
+      }
     }
   }
 

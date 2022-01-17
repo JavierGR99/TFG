@@ -17,9 +17,6 @@ export function AuthProvider({ children }) {
 
     auth.createUserWithEmailAndPassword(email, password)
       .then(doc => {
-        console.log(doc.user.uid)
-        console.log(userName)
-        console.log(aptID)
         postSignUp({
           userID: doc.user.uid,
           userName: userName,

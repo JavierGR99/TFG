@@ -31,32 +31,15 @@ export default function Signup() {
     }
 
     try {
-      // const promises = []
-      // const userId = promises.push(await signup(emailRef.current.value, passwordRef.current.value))
+
       setError("")
       setLoading(true)
       await signup(emailRef.current.value, passwordRef.current.value, userNameRef.current.value, aptRef.current.value)
-      // await postSignUp({
-      //   userID: userId,
-      //   userName: userNameRef.current.value,
-      //   apartmentID: aptID,
-      // })
       history.push("/login")
-      // Promise.all(promises)
-      //   .then(() => {
-      //     history.push("/login")
-      //   })
-      //   .catch(() => {
-      //     setError("Failed to update account")
-      //   })
-      //   .finally(() => {
-      //     setLoading(false)
-      //   })
     } catch (error) {
       setError("Failed to create an account")
     }
 
-    // setLoading(false)
   }
 
   async function setup() {
