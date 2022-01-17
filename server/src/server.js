@@ -11,12 +11,12 @@ app.use(express.urlencoded());
 
 
 
-const middleware = require('./middleware');
+// const middleware = require('./middleware');
 const { json } = require('express');
 
 app.use(cors());
 
-app.use(middleware.decodeToken);
+// app.use(middleware.decodeToken);
 
 app.listen(port, () => {
     console.log('server is running on port ' + port)
@@ -367,18 +367,23 @@ app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
 })
 
 
-app.delete('api/tickets/:ticketID/userID/:userID', async (req, res) => {
+app.delete('/api/tickets/:ticketID/userID/:userID', async (req, res) => {
+
 
     //Coger el id del usuario y comprobar si tiene rol worker o admin
     //Coger el id del ticket y borrarlo
-    console.log(req.params.ticketID)
-    console.log("borrar")
     try {
-        db.collection("tickets").doc(req.params.ticketID).delete
-        console.log("Ticket removed")
-        return res.status(200).json("Ticket deleted correctly")
+        db.collection("tickets").doc(req.params.ticketID).delete()
+            .then(() => {
+                console.log("Ticket removed")
+                return res.status(200).json("Ticket deleted correctly")
+            }).catch((error) => {
+                console.error("Error removing document: ", error);
+            });
+
+
     } catch (error) {
-        return res.status(400).send('Ticket no created, there was a problem')
+        return res.status(400).send('Ticket no deleted, there was a problem')
     }
 })
 

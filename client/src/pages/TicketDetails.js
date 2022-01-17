@@ -18,12 +18,9 @@ function TicketDetails() {
                 ticketID: ticket.ticketID,
                 userID: userID
             }).then(response => {
-                console.log(response.data)
-                console.log(response.status)
-                // window.alert(response.data)
                 history.goBack()
             }).catch(error => {
-                // window.alert(error)
+                window.alert(error)
             })
 
         }

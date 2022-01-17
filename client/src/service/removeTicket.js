@@ -22,11 +22,7 @@ export async function removeTicket(props) {
 
     }).catch(error => {
         return error
-        console.log(error.data)
-        console.log(error.status)
-        if (error.response.data.error) {
-            return []
-        }
+
 
     })
 
