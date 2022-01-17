@@ -10,16 +10,15 @@ function TypeSelect(props, ref) {
 
     return (
         <div>
-            <label>
-                Type:
-                <select ref={ref} onChange={typeOnChange}>
-                    {
-                        props.typeOfTickets.map((type) => {
-                            return <option key={type.id} value={type.type}>{type.type}</option>
-                        })
-                    }
-                </select>
-            </label>
+
+            <select className="browser-default custom-select" ref={ref} onChange={typeOnChange}>
+                {
+                    props.typeOfTickets.map((type) => {
+                        return <option key={type.id} value={type.type}>{type.type}</option>
+                    })
+                }
+            </select>
+
         </div>
     )
 }

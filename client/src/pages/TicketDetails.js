@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { Button, Modal } from 'react-bootstrap';
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import { removeTicket } from '../service/removeTicket';
 
@@ -11,19 +12,21 @@ function TicketDetails() {
     const { role } = location.state || "tenant";
     const history = useHistory()
 
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
     async function handleRemoveTicket() {
 
-        if (window.confirm("Do you really want to remove ticket?")) {
-            removeTicket({
-                ticketID: ticket.ticketID,
-                userID: userID
-            }).then(response => {
-                history.goBack()
-            }).catch(error => {
-                window.alert(error)
-            })
-
-        }
+        removeTicket({
+            ticketID: ticket.ticketID,
+            userID: userID
+        }).then(response => {
+            history.goBack()
+        }).catch(error => {
+            window.alert(error)
+        })
     }
     return (
         <div>
@@ -80,7 +83,23 @@ function TicketDetails() {
                         {
                             (role !== "tenant" || (role === "tenant" && ticket.state === "requested")) &&
                             <>
-                                <button type="button" className="btn btn-danger mr-5" onClick={() => handleRemoveTicket()}>Remove ticket</button>
+                                <Button type="button" className="btn btn-danger mr-5" variant="primary" onClick={handleShow}>
+                                    Remove ticket
+                                </Button>
+
+                                <Modal show={show} onHide={handleClose}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Do you really want to remove ticket?</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={() => handleClose()}>
+                                            Close
+                                        </Button>
+                                        <Button variant="primary" onClick={() => handleRemoveTicket()}>
+                                            Yes, Remove ticket
+                                        </Button>
+                                    </Modal.Footer>
+                                </Modal>
                                 <Link to={{
                                     pathname: `/editTicket`,
                                     state: {
@@ -101,11 +120,6 @@ function TicketDetails() {
                     </div>
                 </div>
             }
-
-
-
-
-
 
 
         </div >

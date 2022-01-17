@@ -11,6 +11,7 @@ import TimeChoose from '../components/TimeChoose'
 import ApartmentsSelect from '../components/ApartmentsSelect'
 import { useAuth } from '../contexts/AuthContext'
 import { getRole } from '../service/getRole'
+import { Form, Button, Card, Alert, Modal } from "react-bootstrap"
 
 
 
@@ -21,11 +22,13 @@ function NewTicket() {
     const workerRef = useRef(null)
     const typeRef = useRef("")
     const stateRef = useRef("")
-    const descriptionRef = useRef(null)
+    const descriptionRef = useRef("")
     const [apts, setApts] = useState([])
     const [workers, setWorkers] = useState([])
     const history = useHistory()
     const { currentUser } = useAuth()
+
+
 
     const userID = currentUser.uid
 
@@ -42,7 +45,7 @@ function NewTicket() {
     ]
 
     async function setup() {
-        //Comprobar si el rol es tenant coger el apartamento que tiene asignado y no un sel
+        //Comprobar si el rol es tenant coger el apartamento que tiene asignado y no un select
         const role = await getRole({
             userID: userID
         })
@@ -74,7 +77,7 @@ function NewTicket() {
             // postData.timeSelected = timeRef.current.value
         }
 
-
+        console.log(postData)
 
         await postTicket({
             postData: postData,
@@ -103,28 +106,62 @@ function NewTicket() {
     //     return <div>Loading</div>
     // }
     return (
-        <form onSubmit={handleSubmit}>
 
-            <ApartmentsSelect ref={aptRef} apts={apts}></ApartmentsSelect>
+        // <form onSubmit={handleSubmit}>
 
-            <StateSelect typeRef={typeRef.current.value} typeOfState={typeOfState} ref={stateRef} workersChange={workers => setWorkers(workers)}></StateSelect>
+        //     <h1>Create Ticket</h1>
 
-            <TypeSelect workersChange={workers => setWorkers(workers)} ref={typeRef} typeOfTickets={typeOfTickets}></TypeSelect>
+        //     <ApartmentsSelect ref={aptRef} apts={apts}></ApartmentsSelect>
 
-            <WorkersSelect ref={workerRef} workers={workers} ticketState={stateRef.current.value} ></WorkersSelect>
+        //     <StateSelect typeRef={typeRef.current.value} typeOfState={typeOfState} ref={stateRef} workersChange={workers => setWorkers(workers)}></StateSelect>
 
-            <div>
-                <label>
-                    Description:
-                </label> <br />
-                <textarea ref={descriptionRef} placeholder='Write here'>
-                </textarea>
-            </div>
+        //     <TypeSelect workersChange={workers => setWorkers(workers)} ref={typeRef} typeOfTickets={typeOfTickets}></TypeSelect>
 
-            {/* <TimeChoose ref={timeRef} ticketState={stateRef.current.value}></TimeChoose> */}
+        //     <WorkersSelect ref={workerRef} workers={workers} ticketState={stateRef.current.value} ></WorkersSelect>
 
-            <input type="submit" value="Save ticket" />
-        </form >
+        //     <label>
+        //         Description:
+        //     </label>
+        //     <textarea class="form-control" ref={descriptionRef} placeholder='Write here'> </textarea>
+
+        //     {/* <TimeChoose ref={timeRef} ticketState={stateRef.current.value}></TimeChoose> */}
+        //     <div></div><button type="submit" class="btn btn-primary">Save ticket</button>
+        // </form >
+        <>
+
+
+            <Card>
+                <Card.Body>
+                    <h2 className="text-center mb-4">Create ticket</h2>
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group id="apartmentSelect">
+                            <Form.Label>Apartment</Form.Label>
+                            <ApartmentsSelect ref={aptRef} apts={apts}></ApartmentsSelect>
+                        </Form.Group>
+                        <Form.Group id="stateSelect">
+                            <Form.Label>State:</Form.Label>
+                            <StateSelect typeRef={typeRef.current.value} typeOfState={typeOfState} ref={stateRef} workersChange={workers => setWorkers(workers)}></StateSelect>
+                        </Form.Group>
+                        <Form.Group id="typeSelect">
+                            <Form.Label>Type:</Form.Label>
+                            <TypeSelect workersChange={workers => setWorkers(workers)} ref={typeRef} typeOfTickets={typeOfTickets}></TypeSelect>
+                        </Form.Group>
+                        <Form.Group id="workerSelect">
+                            {stateRef.current.value !== "requested" && <Form.Label>Worker:</Form.Label>}
+                            <WorkersSelect ref={workerRef} workers={workers} ticketState={stateRef.current.value} ></WorkersSelect>
+                        </Form.Group>
+                        <Form.Group id="description">
+                            <Form.Label>Description:</Form.Label>
+                            <Form.Control as="textarea" rows={3} ref={descriptionRef} required ></Form.Control>
+                        </Form.Group>
+                        <Button className="w-100" type="submit">
+                            Save ticket
+                        </Button>
+                    </Form>
+                </Card.Body>
+            </Card>
+
+        </>
     )
 }
 

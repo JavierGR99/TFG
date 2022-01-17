@@ -11,16 +11,16 @@ function StateSelect(props, ref) {
     return (
 
         <div>
-            <label>
-                State:
-                <select ref={ref} onChange={stateOnChange} >
-                    {
-                        props.typeOfState.map((s) => {
-                            return <option key={s.id} value={s.state}>{s.state}</option>
-                        })
-                    }
-                </select>
-            </label>
+
+
+            <select className="browser-default custom-select" ref={ref} onChange={stateOnChange} >
+                {
+                    props.typeOfState.map((s) => {
+                        return <option key={s.id} value={s.state}>{s.state}</option>
+                    })
+                }
+            </select>
+
         </div>
     )
 }

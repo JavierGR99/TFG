@@ -315,15 +315,13 @@ app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
     //and put it automatically
     try {
         if (db.collection('admin').where("id", "==", req.params.adminID)) {
-
         } else {
             return res.status.apply(401).json({ error: "Not authorized" })
         }
 
         var queryTeanant = db.collection('tenants')
-            .where("apartmentID", "==", req.query.apartmentID)
+            .where("apartmentID", "==", req.body.apartmentID)
             .where("state", "==", "active")
-
 
         const querySnapshot = await queryTeanant.get();
         var tenant = ""
@@ -356,9 +354,9 @@ app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
             })
 
 
-
         return res.status(201).send('Ticket added correctly' + "\n" + JSON.stringify(newTicket))
     } catch (error) {
+        console.log("error")
         return res.status(400).send('Ticket no created, there was a problem')
     }
     //Check if admin is correct
@@ -480,7 +478,7 @@ app.post('/api/signUp/userID/:userID', async (req, res) => {
 
         const tenant = {
             userID: req.params.userID,
-            aptarmentID: req.query.aptID,
+            apartmentID: req.query.aptID,
             state: "active"
         }
 

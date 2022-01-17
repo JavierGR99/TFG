@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Alert } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
 function Tickets(props) {
@@ -11,7 +12,7 @@ function Tickets(props) {
                 ) : (
                     props.tickets.map((t) => {
                         return (
-                            <div key={t.ticketID}>
+                            <div key={t.ticketID} >
                                 <span>Type: {t.type} </span>
                                 <br />
                                 <span>Apartment : {t.aptName} {t.aptNumber} </span>
