@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Card, Modal, Row } from 'react-bootstrap';
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import { removeTicket } from '../service/removeTicket';
 
@@ -30,99 +30,103 @@ function TicketDetails() {
     }
     return (
         <div>
-            <h1>TICKET DETAILS</h1>
-            {
-                ticket &&
-                <div>
-                    <div>
-                        <p>Apartment: {ticket.aptName} {ticket.aptNumber} </p>
-                    </div>
-
-                    <div>
-                        <p>Type: {ticket.type}</p>
-                    </div>
-
-                    <div>
-                        <p>State: {ticket.state} </p>
-                    </div>
-
-                    <div>
-                        <p>Description: {ticket.description}</p>
-                    </div>
-
+            <Card>
+                <Card.Body>
+                    <h1 className="text-center mb-4">Ticket Details</h1>
+                    <Card.Subtitle>Apartament:</Card.Subtitle>
+                    <Card.Text>
+                        {ticket.aptName} {ticket.aptNumber}
+                    </Card.Text>
+                    <Card.Subtitle>Type:</Card.Subtitle>
+                    <Card.Text>
+                        {ticket.type}
+                    </Card.Text>
+                    <Card.Subtitle>State:</Card.Subtitle>
+                    <Card.Text>
+                        {ticket.state}
+                    </Card.Text>
+                    <Card.Subtitle>Description:</Card.Subtitle>
+                    <Card.Text>
+                        {ticket.description}
+                    </Card.Text>
+                    <Card.Subtitle>Created Time:</Card.Subtitle>
+                    <Card.Text>
+                        {ticket.createdTime}
+                    </Card.Text>
+                    <Card.Subtitle>Created By:</Card.Subtitle>
+                    <Card.Text>
+                        {ticket.createdByName}
+                    </Card.Text>
                     {
-                        ticket.workerName &&
-                        <div>
-                            <p>Worker: {ticket.workerName}</p>
-                        </div>
-                    }
-
-                    <div>
-                        <p>Created Time: {ticket.createdTime}</p>
-                    </div>
-
-                    <div>
-                        <p>Created By: {ticket.createdByName}</p>
-                    </div>
-
-                    {
-
                         ticket.tenantName ? (
-                            <div>
-                                <p>Tenant: {ticket.tenantName}</p>
-                            </div>
+                            <>
+                                <Card.Subtitle>Tenant:</Card.Subtitle>
+                                <Card.Text>
+                                    {ticket.tenantName}
+                                </Card.Text>
+                            </>
                         ) : (
-                            <div>
-                                <p>Tenant: No tenant was active</p>
-                            </div>
+                            <>
+                                <Card.Subtitle>Tenant:</Card.Subtitle>
+                                <Card.Text>
+                                    No tenant was active
+                                </Card.Text>
+                            </>
                         )
                     }
+                    {
+                        ticket.workerName &&
+                        <>
+                            <Card.Subtitle>Worker:</Card.Subtitle>
+                            <Card.Text>
+                                {ticket.workerName}
+                            </Card.Text>
+                        </>
+                    }
 
-
-                    <div>
-                        {
-                            (role !== "tenant" || (role === "tenant" && ticket.state === "requested")) &&
-                            <>
-                                <Button type="button" className="btn btn-danger mr-5" variant="primary" onClick={handleShow}>
-                                    Remove ticket
-                                </Button>
-
-                                <Modal show={show} onHide={handleClose}>
-                                    <Modal.Header closeButton>
-                                        <Modal.Title>Do you really want to remove ticket?</Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Footer>
-                                        <Button variant="secondary" onClick={() => handleClose()}>
-                                            Close
-                                        </Button>
-                                        <Button variant="primary" onClick={() => handleRemoveTicket()}>
-                                            Yes, Remove ticket
-                                        </Button>
-                                    </Modal.Footer>
-                                </Modal>
-                                <Link to={{
-                                    pathname: `/editTicket`,
-                                    state: {
-                                        ticket: ticket
-                                    }
-                                }}>Edit ticket</Link>
-                            </>
-                        }
-                    </div>
+                    {
+                        (role !== "tenant" || (role === "tenant" && ticket.state === "requested")) &&
+                        <div className="pt-2 d-flex justify-content-between">
+                            <Button type="button" className="btn btn-danger btn-lg mx-auto " onClick={handleShow}>
+                                Remove ticket
+                            </Button>
+                            <Link className="btn btn-secondary btn-lg mx-auto" to={{
+                                pathname: `/editTicket`,
+                                state: {
+                                    ticket: ticket
+                                }
+                            }}>Edit ticket</Link>
+                        </div>
+                    }
                     <br></br>
                     <div>
                         {
                             role === "worker" && ticket.state === "requested" && (
-
-                                <button type="button" className="btn btn-success mr-5" > Accept ticket</button>
+                                <div className="d-flex justify-content-center">
+                                    <button type="button" className="mx-2 btn btn-success btn-lg w-75"> Accept ticket</button>
+                                </div>
                             )
                         }
                     </div>
-                </div>
-            }
+                </Card.Body>
+            </Card>
 
 
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Do you really want to remove ticket?</Modal.Title>
+                </Modal.Header>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => handleClose()}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={() => handleRemoveTicket()}>
+                        Yes, Remove ticket
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div >
+
 
     )
 }

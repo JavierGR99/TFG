@@ -414,6 +414,44 @@ app.get('/api/apartments', async (req, res) => {
 
 })
 
+app.get('/api/apartments/tenantID/:tenantID', async (req, res) => {
+
+    try {
+
+        const apartmentID = await db.collection('tenants')
+            .where("userID", "==", req.params.tenantID)
+            .get()
+            .then(querySnapshot => {
+                if (!querySnapshot.empty) {
+                    return querySnapshot.docs[0].data().apartmentID
+                }
+            })
+
+
+
+        const apartmentData = await db.collection('apartaments')
+            .doc(apartmentID)
+            .get()
+            .then((doc) => {
+                if (doc.exists) {
+                    return {
+                        id: apartmentID,
+                        ...doc.data(),
+                    }
+                }
+            })
+
+
+
+        return res.send(apartmentData)
+
+    } catch (error) {
+        console.log("Invalid authentication")
+        return res.send(error.code).status(401)
+    }
+
+})
+
 
 
 

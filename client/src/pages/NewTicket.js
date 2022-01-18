@@ -12,6 +12,7 @@ import ApartmentsSelect from '../components/ApartmentsSelect'
 import { useAuth } from '../contexts/AuthContext'
 import { getRole } from '../service/getRole'
 import { Form, Button, Card, Alert, Modal } from "react-bootstrap"
+import { getTenantApartment } from '../service/getTenantApartment'
 
 
 
@@ -23,12 +24,11 @@ function NewTicket() {
     const typeRef = useRef("")
     const stateRef = useRef("")
     const descriptionRef = useRef("")
-    const [apts, setApts] = useState([])
     const [workers, setWorkers] = useState([])
     const history = useHistory()
     const { currentUser } = useAuth()
-
-
+    const [typeOfState, setTypeOfState] = useState([])
+    const [apts, setApts] = useState([])
 
     const userID = currentUser.uid
 
@@ -38,21 +38,32 @@ function NewTicket() {
         { id: 3, type: "maintenance" }
     ]
 
-    const typeOfState = [
-        { id: 1, state: "requested" },
-        { id: 2, state: "accepted" },
-        { id: 3, state: "done" }
-    ]
+
 
     async function setup() {
         //Comprobar si el rol es tenant coger el apartamento que tiene asignado y no un select
         const role = await getRole({
             userID: userID
         })
-        if (role === "tenant") {
 
+        if (role === "tenant") {
+            setApts([await getTenantApartment({
+                userID: userID
+            })])
+            setTypeOfState([
+                { id: 1, state: "requested" }
+            ])
+        } else {
+            setApts(await getApartments())
+            setTypeOfState([
+                { id: 1, state: "requested" },
+                { id: 2, state: "accepted" },
+                { id: 3, state: "done" }
+            ])
         }
-        setApts(await getApartments())
+
+
+
     }
 
     async function handleSubmit(e) {
@@ -84,6 +95,8 @@ function NewTicket() {
             adminID: adminID
         })
 
+
+
         history.push("/")
     }
 
@@ -100,39 +113,13 @@ function NewTicket() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-
-
-    // if (workers.length == 0 && apts.length === 0) {
-    //     return <div>Loading</div>
-    // }
     return (
-
-        // <form onSubmit={handleSubmit}>
-
-        //     <h1>Create Ticket</h1>
-
-        //     <ApartmentsSelect ref={aptRef} apts={apts}></ApartmentsSelect>
-
-        //     <StateSelect typeRef={typeRef.current.value} typeOfState={typeOfState} ref={stateRef} workersChange={workers => setWorkers(workers)}></StateSelect>
-
-        //     <TypeSelect workersChange={workers => setWorkers(workers)} ref={typeRef} typeOfTickets={typeOfTickets}></TypeSelect>
-
-        //     <WorkersSelect ref={workerRef} workers={workers} ticketState={stateRef.current.value} ></WorkersSelect>
-
-        //     <label>
-        //         Description:
-        //     </label>
-        //     <textarea class="form-control" ref={descriptionRef} placeholder='Write here'> </textarea>
-
-        //     {/* <TimeChoose ref={timeRef} ticketState={stateRef.current.value}></TimeChoose> */}
-        //     <div></div><button type="submit" class="btn btn-primary">Save ticket</button>
-        // </form >
         <>
 
 
             <Card>
                 <Card.Body>
-                    <h2 className="text-center mb-4">Create ticket</h2>
+                    <h1 className="text-center mb-4">Create ticket</h1>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group id="apartmentSelect">
                             <Form.Label>Apartment</Form.Label>
@@ -147,8 +134,12 @@ function NewTicket() {
                             <TypeSelect workersChange={workers => setWorkers(workers)} ref={typeRef} typeOfTickets={typeOfTickets}></TypeSelect>
                         </Form.Group>
                         <Form.Group id="workerSelect">
-                            {stateRef.current.value !== "requested" && <Form.Label>Worker:</Form.Label>}
-                            <WorkersSelect ref={workerRef} workers={workers} ticketState={stateRef.current.value} ></WorkersSelect>
+                            {((stateRef.current.value === "accepted") || (stateRef.current.value === "done")) &&
+                                <>
+                                    <Form.Label>Worker:</Form.Label>
+                                    <WorkersSelect ref={workerRef} workers={workers} typeOfState={typeOfState} ></WorkersSelect>
+                                </>
+                            }
                         </Form.Group>
                         <Form.Group id="description">
                             <Form.Label>Description:</Form.Label>
