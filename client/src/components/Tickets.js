@@ -11,6 +11,7 @@ function Tickets(props) {
                     <div> No hay tiques disponibles </div>
                 ) : (
                     props.tickets.map((t) => {
+
                         return (
                             <div key={t.ticketID} >
                                 <span>Tipo: {t.type} </span>

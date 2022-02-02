@@ -18,7 +18,7 @@ function EditTicket() {
     const { ticket, userRole } = location.state;
 
     const aptRef = createRef(ticket.apartmentID)
-    const workerRef = useRef(null)
+    const workerRef = useRef(ticket.worker)
     const typeRef = useRef("")
     const stateRef = useRef("")
     const descriptionRef = useRef("")
