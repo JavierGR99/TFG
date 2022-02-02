@@ -70,7 +70,7 @@ function NewTicket() {
 
         e.preventDefault()
 
-        const adminID = auth.currentUser.uid
+        const userID = auth.currentUser.uid
         const todaysDate = await getTodayDate()
 
         let postData = {
@@ -78,24 +78,21 @@ function NewTicket() {
             state: stateRef.current.value,
             type: typeRef.current.value,
             description: descriptionRef.current.value,
-            createdBy: adminID,
+            createdBy: userID,
             createdTime: todaysDate
         }
 
 
         if (stateRef.current.value !== "requested") {
             postData.worker = workerRef.current.value
-            // postData.timeSelected = timeRef.current.value
         }
 
         console.log(postData)
 
         await postTicket({
             postData: postData,
-            adminID: adminID
+            userID: userID
         })
-
-
 
         history.push("/")
     }
@@ -119,18 +116,23 @@ function NewTicket() {
 
             <Card>
                 <Card.Body>
-                    <h1 className="text-center mb-4">Create ticket</h1>
+                    <div className="mb-3 d-flex align-items-center">
+                        <button type="button" variant="link" onClick={() => history.goBack()} className="mr-auto btn btn-secondary">
+                            <i className="bi bi-arrow-return-left"></i>
+                        </button>
+                        <h1 className="mr-auto">Crear Tique</h1>
+                    </div>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group id="apartmentSelect">
-                            <Form.Label>Apartment</Form.Label>
+                            <Form.Label>Apartamento:</Form.Label>
                             <ApartmentsSelect ref={aptRef} apts={apts}></ApartmentsSelect>
                         </Form.Group>
                         <Form.Group id="stateSelect">
-                            <Form.Label>State:</Form.Label>
+                            <Form.Label>Estado:</Form.Label>
                             <StateSelect typeRef={typeRef.current.value} typeOfState={typeOfState} ref={stateRef} workersChange={workers => setWorkers(workers)}></StateSelect>
                         </Form.Group>
                         <Form.Group id="typeSelect">
-                            <Form.Label>Type:</Form.Label>
+                            <Form.Label>Tipo:</Form.Label>
                             <TypeSelect workersChange={workers => setWorkers(workers)} ref={typeRef} typeOfTickets={typeOfTickets}></TypeSelect>
                         </Form.Group>
                         <Form.Group id="workerSelect">
@@ -142,11 +144,11 @@ function NewTicket() {
                             }
                         </Form.Group>
                         <Form.Group id="description">
-                            <Form.Label>Description:</Form.Label>
+                            <Form.Label>Descripción:</Form.Label>
                             <Form.Control as="textarea" rows={3} ref={descriptionRef} required ></Form.Control>
                         </Form.Group>
                         <Button className="w-100" type="submit">
-                            Save ticket
+                            Guardar Tique
                         </Button>
                     </Form>
                 </Card.Body>

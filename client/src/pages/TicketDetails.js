@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Button, Card, Modal, Row } from 'react-bootstrap';
+import { Button, Card, Modal } from 'react-bootstrap';
 import { Link, useHistory, useLocation } from 'react-router-dom'
+import { putTicket } from '../service/putTicket';
 import { removeTicket } from '../service/removeTicket';
 
 
@@ -22,42 +23,97 @@ function TicketDetails() {
         removeTicket({
             ticketID: ticket.ticketID,
             userID: userID
-        }).then(response => {
+        }).then(
             history.goBack()
-        }).catch(error => {
+        ).catch(error => {
             window.alert(error)
         })
     }
+
+    async function handleAcceptTicket() {
+        var postData = {
+            apartmentID: ticket.apartmentID,
+            createdBy: ticket.createdBy,
+            createdTime: ticket.createdTime,
+            description: ticket.description,
+            state: "accepted",
+            tenantID: ticket.tenantID,
+            type: ticket.type,
+            worker: userID
+        }
+        putTicket({
+            ticketID: ticket.ticketID,
+            postData: postData
+        }).then(
+            history.goBack()
+        ).catch(error => {
+            window.alert(error)
+        })
+
+    }
+
+    async function handleRealizeTicket() {
+        var postData = {
+            apartmentID: ticket.apartmentID,
+            createdBy: ticket.createdBy,
+            createdTime: ticket.createdTime,
+            description: ticket.description,
+            state: "done",
+            tenantID: ticket.tenantID,
+            type: ticket.type,
+            worker: userID
+        }
+        putTicket({
+            ticketID: ticket.ticketID,
+            postData: postData
+        }).then(
+            history.goBack()
+        ).catch(error => {
+            window.alert(error)
+        })
+
+    }
+
+
+
     return (
         <div>
             <Card>
                 <Card.Body>
-                    <h1 className="text-center mb-4">Ticket Details</h1>
-                    <Card.Subtitle>Apartament:</Card.Subtitle>
+                    <div className="mb-3 d-flex align-items-center">
+
+                        {/* <h2 className="text-center">Restablecer Contraseña</h2> */}
+                        <button type="button" variant="link" onClick={() => history.goBack()} className="mr-auto btn btn-secondary">
+                            <i className="bi bi-arrow-return-left"></i>
+                        </button>
+                        <h1 className="mr-auto">Detalles Tique</h1>
+                    </div>
+
+                    <Card.Subtitle>Apartamento:</Card.Subtitle>
                     <Card.Text>
                         {ticket.aptName} {ticket.aptNumber}
                     </Card.Text>
-                    <Card.Subtitle>Type:</Card.Subtitle>
-                    <Card.Text>
-                        {ticket.type}
-                    </Card.Text>
-                    <Card.Subtitle>State:</Card.Subtitle>
+                    <Card.Subtitle>Estado:</Card.Subtitle>
                     <Card.Text>
                         {ticket.state}
                     </Card.Text>
-                    <Card.Subtitle>Description:</Card.Subtitle>
+                    <Card.Subtitle>Tipo:</Card.Subtitle>
+                    <Card.Text>
+                        {ticket.type}
+                    </Card.Text>
+                    <Card.Subtitle>Descripción:</Card.Subtitle>
                     <Card.Text>
                         {ticket.description}
                     </Card.Text>
-                    <Card.Subtitle>Created Time:</Card.Subtitle>
+                    <Card.Subtitle>Fecha Creación:</Card.Subtitle>
                     <Card.Text>
                         {ticket.createdTime}
                     </Card.Text>
-                    <Card.Subtitle>Created By:</Card.Subtitle>
+                    <Card.Subtitle>Creado por:</Card.Subtitle>
                     <Card.Text>
                         {ticket.createdByName}
                     </Card.Text>
-                    {
+                    {/* {
                         ticket.tenantName ? (
                             <>
                                 <Card.Subtitle>Tenant:</Card.Subtitle>
@@ -73,11 +129,11 @@ function TicketDetails() {
                                 </Card.Text>
                             </>
                         )
-                    }
+                    } */}
                     {
-                        ticket.workerName &&
+                        ticket.worker &&
                         <>
-                            <Card.Subtitle>Worker:</Card.Subtitle>
+                            <Card.Subtitle>Trabajador:</Card.Subtitle>
                             <Card.Text>
                                 {ticket.workerName}
                             </Card.Text>
@@ -88,14 +144,15 @@ function TicketDetails() {
                         (role !== "tenant" || (role === "tenant" && ticket.state === "requested")) &&
                         <div className="pt-2 d-flex justify-content-between">
                             <Button type="button" className="btn btn-danger btn-lg mx-auto " onClick={handleShow}>
-                                Remove ticket
+                                Borrar Tique
                             </Button>
-                            <Link className="btn btn-secondary btn-lg mx-auto" to={{
+                            <Link className="btn btn-primary btn-lg mx-auto" to={{
                                 pathname: `/editTicket`,
                                 state: {
-                                    ticket: ticket
+                                    ticket: ticket,
+                                    userRole: role
                                 }
-                            }}>Edit ticket</Link>
+                            }}>Editar Tique</Link>
                         </div>
                     }
                     <br></br>
@@ -103,9 +160,19 @@ function TicketDetails() {
                         {
                             role === "worker" && ticket.state === "requested" && (
                                 <div className="d-flex justify-content-center">
-                                    <button type="button" className="mx-2 btn btn-success btn-lg w-75"> Accept ticket</button>
+                                    <button type="button" className="mx-2 btn btn-success btn-lg w-75" onClick={() => handleAcceptTicket()}> Aceptar Tique</button>
                                 </div>
                             )
+
+                        }
+                        {
+
+                            role === "worker" && ticket.state === "accepted" && (
+                                <div className="d-flex justify-content-center">
+                                    <button type="button" className="mx-2 btn btn-success btn-lg w-75" onClick={() => handleRealizeTicket()}> Realizar Tique</button>
+                                </div>
+                            )
+
                         }
                     </div>
                 </Card.Body>
@@ -114,14 +181,14 @@ function TicketDetails() {
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Do you really want to remove ticket?</Modal.Title>
+                    <Modal.Title>¿Seguro que quieres borrar el tique?</Modal.Title>
                 </Modal.Header>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => handleClose()}>
-                        Close
+                        Cerrar
                     </Button>
                     <Button variant="primary" onClick={() => handleRemoveTicket()}>
-                        Yes, Remove ticket
+                        Sí, Borrar Tique
                     </Button>
                 </Modal.Footer>
             </Modal>

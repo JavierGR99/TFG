@@ -5,6 +5,7 @@ import { Link, useHistory } from "react-router-dom"
 import { getTicket } from "../service/getTicket"
 import Tickets from '../components/Tickets'
 import { getRole } from "../service/getRole"
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export default function Dashboard() {
   const [error, setError] = useState("")
@@ -74,35 +75,27 @@ export default function Dashboard() {
 
   return (
     <>
+
+
       <Card>
         <Card.Body>
-          <h2 className="text-center mb-4">Profile</h2>
-          {error && <Alert variant="danger">{error}</Alert>}
-          <strong>Email:</strong> {currentUser.email}<br />
-          <strong>UserID:</strong> {userID}
-          <Link to="/update-profile" className="btn btn-primary w-100 mt-3">
-            Update Profile
-          </Link>
+
+          <div className="mb-3 d-flex align-items-center">
+            <h1 className="ml-auto">INICIO</h1>
+            {/* <h2 className="text-center">Restablecer Contraseña</h2> */}
+            <button type="button" variant="link" onClick={handleLogout} className="ml-auto btn btn-secondary">
+              <i className="bi bi-box-arrow-left"></i>
+            </button>
+          </div>
+
+          <Tickets state={"SOLICITADOS"} role={userRol} userID={userID} tickets={reqTickets}></Tickets>
+          <Tickets state={"ACEPTADOS"} role={userRol} userID={userID} tickets={acptTickets}></Tickets>
+          <Tickets state={"REALIZADOS"} role={userRol} userID={userID} tickets={doneTickets}></Tickets>
         </Card.Body>
       </Card>
-      <div className="w-100 text-center mt-2">
-        <Button variant="link" onClick={handleLogout}>
-          Log Out
-        </Button>
-      </div>
-
-      <Tickets state={"SOLICITADOS"} role={userRol} userID={userID} tickets={reqTickets}></Tickets>
-      <Tickets state={"ACEPTADOS"} role={userRol} userID={userID} tickets={acptTickets}></Tickets>
-      <Tickets state={"REALIZADOS"} role={userRol} userID={userID} tickets={doneTickets}></Tickets>
-
-
-
       <Link to="/NewTicket" className="btn btn-primary w-100 mt-3">
-        Create new ticket
+        Crear nuevo tique
       </Link>
-
-
-
     </>
   )
 }

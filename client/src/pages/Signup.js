@@ -55,11 +55,11 @@ export default function Signup() {
     <>
       <Card>
         <Card.Body>
-          <h2 className="text-center mb-4">Sign Up</h2>
+          <h2 className="text-center mb-4">Registrarse</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group id="userName">
-              <Form.Label>User Name</Form.Label>
+              <Form.Label>Nombre Usuario</Form.Label>
               <Form.Control type="text" ref={userNameRef} placeholder="Javier Gallego" required />
             </Form.Group>
             <Form.Group id="email">
@@ -67,22 +67,26 @@ export default function Signup() {
               <Form.Control type="email" ref={emailRef} required />
             </Form.Group>
             <Form.Group id="password">
-              <Form.Label>Password</Form.Label>
+              <Form.Label>Contraseña</Form.Label>
               <Form.Control type="password" ref={passwordRef} required />
             </Form.Group>
             <Form.Group id="password-confirm">
-              <Form.Label>Password Confirmation</Form.Label>
+              <Form.Label>Confirma contraseña</Form.Label>
               <Form.Control type="password" ref={passwordConfirmRef} required />
             </Form.Group>
-            <ApartmentsSelect ref={aptRef} apts={apts}></ApartmentsSelect>
+            <Form.Group id="apartament">
+              <Form.Label>Apartamento</Form.Label>
+              <ApartmentsSelect ref={aptRef} apts={apts}></ApartmentsSelect>
+            </Form.Group>
+
             <Button disabled={loading} className="w-100" type="submit">
-              Sign Up
+              Crear Cuenta
             </Button>
           </Form>
         </Card.Body>
       </Card>
       <div className="w-100 text-center mt-2">
-        Already have an account? <Link to="/login">Log In</Link>
+        ¿Ya tienes una cuenta? <Link to="/login">Iniciar Sesión</Link>
       </div>
     </>
   )

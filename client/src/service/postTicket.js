@@ -5,7 +5,9 @@ export async function postTicket(props) {
 
     const userToken = localStorage.getItem('user-token')
 
-    const url = `http://localhost:5000/api/tickets/adminID/${props.adminID}`
+    console.log(props.userID)
+
+    const url = `http://localhost:5000/api/tickets/userID/${props.userID}`
 
     return await axios.post(url, props.postData, {
         headers: {

@@ -308,16 +308,12 @@ app.get('/api/tickets/adminID/:adminID', async (req, res) => {
 
 //ADMIN CREATES NEW TICKET 
 http://localhost:5000/api/tickets/adminID/jzHNOmnt2NbiFAAFesfILqEnWs63/
-app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
+app.post('/api/tickets/userID/:userID/', async (req, res) => {
 
     //IF USER IS TENANT THEN tenant: req.params.userID
     //IF USER IS ADMIN THEN search the actual tenant who's in the apartment
     //and put it automatically
     try {
-        if (db.collection('admin').where("id", "==", req.params.adminID)) {
-        } else {
-            return res.status.apply(401).json({ error: "Not authorized" })
-        }
 
         var queryTeanant = db.collection('tenants')
             .where("apartmentID", "==", req.body.apartmentID)
@@ -348,10 +344,10 @@ app.post('/api/tickets/adminID/:adminID/', async (req, res) => {
                     ...newTicket,
                     ticketID: docRef.id
                 }
-                console.log("Ticket added correctyly: ")
-                console.log(newTicket)
-
             })
+
+        console.log("Ticket added correctyly: ")
+        console.log(newTicket)
 
 
         return res.status(201).send('Ticket added correctly' + "\n" + JSON.stringify(newTicket))
@@ -545,18 +541,18 @@ app.post('/api/signUp/userID/:userID', async (req, res) => {
 // UPDATE ticket from state "solicitar" to "aceptar"
 // Example: worker "cleaner" accepts a ticket
 http://localhost:5000/api/tickets/ticketId/kVSy9FMC3CDDhdnbgx2n/worker/jzHNOmnt2NbiFAAFesfILqEnWs63/stateAfter/aceptado
-app.put('/api/tickets/ticketId/:ticketId/worker/:worker/stateAfter/:stateAfter', async (req, res) => {
+app.put('/api/tickets/ticketId/:ticketId/', async (req, res) => {
 
     try {
 
-        const newTicket = {
-            worker: req.params.worker,
-            state: req.params.stateAfter
-        }
+        const ticketEdited = req.body
 
-        db.collection('tickets').doc(req.params.ticketId).update(newTicket)
+        db.collection('tickets').doc(req.params.ticketId).update(ticketEdited)
 
-        return res.status(201).send("Ticket updated correctly" + "\n" + JSON.stringify(newTicket))
+        console.log("Ticket updated correctly");
+        console.log(ticketEdited)
+
+        return res.status(201).send("Ticket updated correctly" + "\n" + JSON.stringify(ticketEdited))
 
     } catch (error) {
         return res.status(500).send("ERROR UPDATING TICKET")

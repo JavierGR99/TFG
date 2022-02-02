@@ -5,19 +5,19 @@ import { Link } from 'react-router-dom'
 function Tickets(props) {
     return (
         <div>
-            <span>TICKETS {props.state}</span>
+            <strong>TIQUES {props.state}</strong>
             {
                 props.tickets.length === 0 ? (
-                    <div> No tickets available </div>
+                    <div> No hay tiques disponibles </div>
                 ) : (
                     props.tickets.map((t) => {
                         return (
                             <div key={t.ticketID} >
-                                <span>Type: {t.type} </span>
+                                <span>Tipo: {t.type} </span>
                                 <br />
-                                <span>Apartment : {t.aptName} {t.aptNumber} </span>
+                                <span>Apartamento : {t.aptName} {t.aptNumber} </span>
                                 <br />
-                                <span>Description : {t.description}</span>
+                                <span>Descripción : {t.description}</span>
                                 <br />
                                 <Link to={{
                                     pathname: `/ticket-details`,
@@ -26,7 +26,7 @@ function Tickets(props) {
                                         userID: props.userID,
                                         role: props.role
                                     }
-                                }}>View Details</Link>
+                                }}>Ver detalles</Link>
                             </div>
 
                         )

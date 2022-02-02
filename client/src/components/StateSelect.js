@@ -7,11 +7,8 @@ function StateSelect(props, ref) {
         console.log(ref.current.value)
         ref.current.value = e.target.value
         props.workersChange(await getWorkers({ type: props.typeRef }))
-
-
-
     }
-    console.log(props.typeOfState)
+
 
 
     return (
@@ -21,7 +18,7 @@ function StateSelect(props, ref) {
                 props.typeOfState.length === 0 ? (
                     <label> No States avaliable</label>
                 ) : (
-                    <select className="browser-default custom-select" ref={ref} onChange={stateOnChange} >
+                    <select className="browser-default custom-select" defaultValue={props.defaultValue} ref={ref} onChange={stateOnChange}>
                         {
                             props.typeOfState.map((s) => {
                                 return <option key={s.id} value={s.state}>{s.state}</option>
